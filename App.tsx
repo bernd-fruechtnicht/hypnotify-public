@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import './src/services/i18n'; // Initialize i18n first
+// Trigger Vercel deployment
 import { useTranslation } from 'react-i18next';
 import { LanguageProvider } from './src/contexts/LanguageContext';
 import { LanguageFlagSelector } from './src/components/LanguageFlagSelector';
