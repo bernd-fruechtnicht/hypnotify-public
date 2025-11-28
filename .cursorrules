@@ -1,0 +1,47 @@
+# CRITICAL RULES - MUST BE FOLLOWED
+
+## Code Implementation Rules
+- NEVER implement code changes without explicit user permission
+- ALWAYS ask "Should I implement this change?" before making any code modifications
+- NEVER assume requirements - always ask for clarification
+- When user says "don't apply anything by yourself without asking" - this means ASK FIRST, implement LATER
+
+## Audio Processing Requirements
+- Server-side FFmpeg processing is REQUIRED for stereo panning
+- Client-side Web Audio API is NOT acceptable for native mobile platforms (Android/iOS)
+- Stereo meditation requires server-side audio processing with FFmpeg
+- Native mobile apps cannot use Web Audio API
+
+## Project-Specific Rules
+- This is a React Native meditation app with stereo meditation features
+- Audio processing must work on Android, iOS, and Web platforms
+- Server-side TTS synthesis with stereo panning is essential
+- Do not break established working functionality
+
+## Communication Rules
+- Always ask for permission before implementing solutions
+- If unsure about requirements, ask for clarification
+- Do not make assumptions about platform capabilities
+- Respect user's explicit instructions about implementation approach
+
+## Error Prevention
+- Do not repeat the same mistakes (like implementing Web Audio API for native mobile)
+- Do not implement solutions without understanding the full requirements
+- Always consider cross-platform compatibility
+- Ask before changing established working code
+
+## Development Workflow Rules
+- NEVER commit and push directly to main branch (except documentation with [skip ci])
+- ALWAYS create feature branches for code changes (e.g., `feature/description` or `fix/description`)
+- ALWAYS test changes locally before pushing to feature branches
+- ALWAYS ask "Should I create a feature branch for this change?" before implementing
+- NEVER push untested code that could waste build minutes
+- ALWAYS use conventional commit messages (feat:, fix:, docs:, etc.)
+- ALWAYS create Pull Requests for code review before merging to main
+- ALWAYS run type-check and lint before committing
+- ALWAYS test on target platform(s) before pushing
+- ALWAYS ask for explicit permission before creating branches or pushing code
+- For documentation-only changes: commit directly to main with [skip ci] marker
+- Only main branch triggers automatic builds and deployments
+- Feature branches can trigger manual builds via GitHub Actions workflow_dispatch
+

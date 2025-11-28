@@ -1,0 +1,16 @@
+{
+  "buildCommand": "npx expo export --platform web",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- '*.md' '.cursorrules' 'docs/**' '*.txt' '.gitignore'",
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
+}
