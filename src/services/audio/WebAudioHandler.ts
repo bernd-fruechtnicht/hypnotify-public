@@ -52,8 +52,33 @@ export class WebAudioHandler implements IAudioHandler {
       this.audioElement.preload = 'auto';
       this.audioElement.volume = 1.0; // Set to max, we'll control via GainNode
 
+      // Resolve the audio source for web
+      // require() in web builds may return a relative path or object
+      let audioSrc: string;
+      if (typeof source === 'string') {
+        audioSrc = source;
+      } else if (source && typeof source === 'object' && source.uri) {
+        audioSrc = source.uri;
+      } else if (source && typeof source === 'object' && source.default) {
+        audioSrc = source.default;
+      } else if (source && typeof source === 'object' && source.__packager_asset) {
+        // Expo asset object - construct path from asset
+        const assetPath = source.__packager_asset.localUri || source.__packager_asset.uri;
+        audioSrc = assetPath.startsWith('/') ? assetPath : `/${assetPath}`;
+      } else {
+        // Try to convert to string (fallback)
+        audioSrc = String(source);
+      }
+
+      // If it's a relative path, make it absolute
+      if (audioSrc && !audioSrc.startsWith('http') && !audioSrc.startsWith('/')) {
+        audioSrc = `/${audioSrc}`;
+      }
+
+      console.log('WebAudioHandler: Loading audio from:', audioSrc);
+      
       // Set the audio source
-      this.audioElement.src = source;
+      this.audioElement.src = audioSrc;
 
       // Wait for audio to be ready
       await new Promise((resolve, reject) => {
