@@ -320,6 +320,18 @@ export class CloudTTSService {
       );
     }
 
+    if (supabaseApiKey) {
+      console.log(
+        'CloudTTSService: Supabase API Key is set (length:',
+        supabaseApiKey.length,
+        'characters)'
+      );
+    } else {
+      console.error(
+        'CloudTTSService: EXPO_PUBLIC_SUPABASE_API_KEY is NOT set! This will cause 401 errors.'
+      );
+    }
+
     return {
       provider: 'google',
       endpoint: supabaseFunctionUrl,
@@ -399,6 +411,15 @@ export class CloudTTSService {
     // Add API key if available (for Supabase Edge Functions)
     if (this.config.apiKey) {
       headers['Authorization'] = `Bearer ${this.config.apiKey}`;
+      console.log(
+        'CloudTTSService: Authorization header set (API key length:',
+        this.config.apiKey.length,
+        'characters)'
+      );
+    } else {
+      console.error(
+        'CloudTTSService: WARNING - No API key configured! Request will fail with 401.'
+      );
     }
 
     console.log(
