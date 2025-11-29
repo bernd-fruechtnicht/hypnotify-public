@@ -55,3 +55,5 @@ coverage/
 
 # Test audio files in root directory
 *.mp3
+# But allow audio files in assets directory
+!assets/**/*.mp3

@@ -691,14 +691,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
               <View style={styles.attributionContainer}>
                 <Text style={styles.attributionTitle}>🎵 Background Music</Text>
                 <Text style={styles.attributionText}>
-                  "Breath of Life_15 minutes" by grand_project
+                  "Breath of Life_5 minutes" by grand_project
                 </Text>
                 <Text style={styles.attributionText}>
                   Licensed under Pixabay License
                 </Text>
                 <Text style={styles.attributionLink}>
                   Source:
-                  https://pixabay.com/de/music/meditation-spirituell-breath-of-life-15-minutes-320860/
+                  https://pixabay.com/de/music/meditation-spirituell-breath-of-life-5-minutes-320858/
                 </Text>
               </View>
             </>

@@ -3,7 +3,7 @@
 Place your background music files in this directory.
 
 ## Quick Start
-1. **Add your audio file**: Place a single audio file named `breath-of-life_15-minutes-320860.mp3` in this directory
+1. **Add your audio file**: Place a single audio file named `breath-of-life_5-minutes-320858.mp3` in this directory
 2. **Enable in settings**: Go to Settings → Audio → Background Music and toggle it on
 3. **Adjust volume**: Use the Background Music Volume slider to set the level relative to speech
 
@@ -13,7 +13,7 @@ Place your background music files in this directory.
 - **M4A** (good compression, iOS optimized)
 
 ## File Requirements
-- **File name**: `breath-of-life_15-minutes-320860.mp3` (exact name required)
+- **File name**: `breath-of-life_5-minutes-320858.mp3` (exact name required)
 - **Duration**: 3-10 minutes recommended (will loop automatically)
 - **Quality**: 128kbps or higher
 - **Volume**: Normalized to prevent clipping
@@ -34,7 +34,7 @@ Place your background music files in this directory.
 
 ## Troubleshooting
 - **No music playing**: Check that the file exists and is named correctly
-- **File not found error**: Ensure `breath-of-life_15-minutes-320860.mp3` is in this exact directory
+- **File not found error**: Ensure `breath-of-life_5-minutes-320858.mp3` is in this exact directory
 - **Volume too loud/quiet**: Adjust the Background Music Volume slider in settings
 - **Music doesn't loop**: Check that the audio file is not corrupted
 

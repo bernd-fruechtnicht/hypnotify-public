@@ -69,10 +69,10 @@ export class BackgroundMusicService {
       await this.audioHandler.initialize();
 
       // Load the background music file
-      // Note: The audio file should be placed in assets/audio/background-music/breath-of-life_15-minutes-320860.mp3
+      // Note: The audio file should be placed in assets/audio/background-music/breath-of-life_5-minutes-320858.mp3
       // If the file doesn't exist, this will throw an error which is handled below
       try {
-        const audioSource = require('../../assets/audio/background-music/breath-of-life_15-minutes-320860.mp3');
+        const audioSource = require('../../assets/audio/background-music/breath-of-life_5-minutes-320858.mp3');
         await this.audioHandler.loadAudio(audioSource);
 
         // Set initial volume
@@ -86,7 +86,7 @@ export class BackgroundMusicService {
           fileError
         );
         console.log(
-          'BackgroundMusicService: Please place a valid audio file at assets/audio/background-music/breath-of-life_15-minutes-320860.mp3'
+          'BackgroundMusicService: Please place a valid audio file at assets/audio/background-music/breath-of-life_5-minutes-320858.mp3'
         );
         this.isInitialized = false;
         // Don't throw error - just mark as not available
