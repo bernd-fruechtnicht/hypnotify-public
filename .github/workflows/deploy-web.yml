@@ -7,32 +7,37 @@ on:
       - completed
     branches: [main, 'feature/**']
   workflow_dispatch:
-    inputs:
-      force_deploy:
-        description: 'Force deployment (ignores commit message)'
-        required: false
-        default: 'false'
-        type: boolean
 
 permissions:
   contents: read
 
 jobs:
+  # Quality Checks bei workflow_dispatch (manueller Trigger, nur von main)
+  # Bei workflow_run werden Quality Checks bereits vom Quality Checks Workflow ausgeführt
+  quality-checks:
+    uses: ./.github/workflows/reusable-quality-checks.yml
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+
   deploy-web:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
-    # Warte auf Quality Checks Workflow (bei workflow_run)
-    # Oder manuell via workflow_dispatch
-    # Auf Feature-Branches: Workflow wird getriggert (zum Testen), aber Deployment wird übersprungen
-    # Auf Main: Deployment nur bei [deploy web] in Commit-Message
+    # Warte auf Quality Checks (bei workflow_dispatch) oder auf workflow_run
+    # Deployment nur von main Branch (sowohl bei workflow_run als auch workflow_dispatch)
+    # Bei workflow_run: Nur bei [deploy web] in Commit-Message
+    needs:
+      - quality-checks
     if: |
+      # Bei workflow_run: Quality Checks bereits gelaufen (workflow_run.conclusion == 'success')
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.head_commit &&
        github.event.workflow_run.head_branch == 'main' &&
        (contains(github.event.workflow_run.head_commit.message, '[deploy web]') ||
         contains(github.event.workflow_run.head_commit.message, '[deploy]'))) ||
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.force_deploy == 'true')
+      # Bei workflow_dispatch: Warte auf Quality Checks (nur von main)
+      (github.event_name == 'workflow_dispatch' &&
+       github.ref == 'refs/heads/main' &&
+       needs.quality-checks.result == 'success')
     environment:
       name: Production – hypnotify
       # Optional: Protection rules aktivieren für zusätzliche Sicherheit
@@ -47,5 +52,7 @@ jobs:
           curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
 
   # Note: Vercel Git Integration ist deaktiviert (vercel.json)
-  # Deployment erfolgt nur via Deploy Hook bei [deploy web] Commit-Message
+  # Deployment erfolgt via:
+  # - Deploy Hook bei [deploy web] Commit-Message (automatisch auf main, nach Quality Checks)
+  # - workflow_dispatch (manuell, nur von main, nach Quality Checks)
   # Lokale Deployments sind weiterhin möglich: vercel deploy --prod

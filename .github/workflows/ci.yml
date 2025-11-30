@@ -21,7 +21,6 @@ jobs:
     steps:
       - name: Workflow placeholder
         run: echo "This workflow is reserved for future CI/CD tasks. Quality checks are handled by quality-checks.yml"
-
 # Build jobs - uncomment when EXPO_TOKEN secret is added
 # build-android:
 #   name: Build Android
