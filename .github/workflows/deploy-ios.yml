@@ -3,6 +3,8 @@ name: Deploy iOS
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       profile:
@@ -28,6 +30,7 @@ jobs:
     needs: quality-checks
     uses: ./.github/workflows/reusable-eas-build.yml
     # Build nur bei [deploy ios] auf main oder manuell
+    # Auf Feature-Branches: Nur Quality Checks, kein Build
     if: |
       (github.ref == 'refs/heads/main' && 
        (contains(github.event.head_commit.message, '[deploy ios]') ||

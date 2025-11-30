@@ -3,6 +3,8 @@ name: Deploy Web
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
     inputs:
       force_deploy:
@@ -25,12 +27,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: quality-checks
     # Deploy nur bei [deploy web] auf main oder manuell
+    # Auf Feature-Branches: Nur Quality Checks, kein Deployment
     if: |
       (github.ref == 'refs/heads/main' && 
        (contains(github.event.head_commit.message, '[deploy web]') ||
         contains(github.event.head_commit.message, '[deploy]'))) ||
-      github.event.inputs.force_deploy == 'true' ||
-      github.event_name == 'workflow_dispatch'
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.force_deploy == 'true')
     environment:
       name: Production – hypnotify
       # Optional: Protection rules aktivieren für zusätzliche Sicherheit
