@@ -11,118 +11,89 @@ permissions:
   contents: read
   pages: write
   id-token: write
+# Note: Quality Checks wurden in quality-checks.yml ausgelagert
+# Dieser Workflow ist für zukünftige CI/CD Tasks reserviert
 
-jobs:
-  quality-checks:
-    uses: ./.github/workflows/reusable-quality-checks.yml
-    # Skip if only documentation files changed
-    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[docs only]')"
-    with:
-      skip_build_check: false
+# Build jobs - uncomment when EXPO_TOKEN secret is added
+# build-android:
+#   name: Build Android
+#   runs-on: ubuntu-latest
+#   if: github.ref == 'refs/heads/main' && secrets.EXPO_TOKEN
+#   steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v4
+#     - name: Setup Node.js
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: '18'
+#         cache: 'npm'
+#     - name: Setup Java
+#       uses: actions/setup-java@v4
+#       with:
+#         distribution: 'temurin'
+#         java-version: '17'
+#     - name: Setup Android SDK
+#       uses: android-actions/setup-android@v3
+#     - name: Install dependencies
+#       run: npm ci
+#     - name: Build Android APK
+#       run: |
+#         npx expo install --fix
+#         npx eas build --platform android --non-interactive --no-wait
+#       env:
+#         EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-  security-audit:
-    name: Security Audit
-    runs-on: ubuntu-latest
+# build-ios:
+#   name: Build iOS
+#   runs-on: macos-latest
+#   if: github.ref == 'refs/heads/main' && secrets.EXPO_TOKEN
+#   steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v4
+#     - name: Setup Node.js
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: '18'
+#         cache: 'npm'
+#     - name: Install dependencies
+#       run: npm ci
+#     - name: Build iOS
+#       run: |
+#         npx expo install --fix
+#         npx eas build --platform ios --non-interactive --no-wait
+#       env:
+#         EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+# deploy-web:
+#   name: Deploy Web
+#   runs-on: ubuntu-latest
+#   if: github.ref == 'refs/heads/main'
+#   # Disabled - using Vercel for deployment instead of GitHub Pages
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
+#   steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: npm ci
+#     - name: Setup Node.js
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: '18'
+#         cache: 'npm'
 
-      - name: Security audit
-        run: npm audit --audit-level moderate
+#     - name: Install dependencies
+#       run: npm ci
 
-      - name: Check for known vulnerabilities
-        run: npx audit-ci --config audit-ci.json
+#     - name: Build web app
+#       run: npx expo export --platform web --output-dir dist
 
-  # Build jobs - uncomment when EXPO_TOKEN secret is added
-  # build-android:
-  #   name: Build Android
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/main' && secrets.EXPO_TOKEN
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '18'
-  #         cache: 'npm'
-  #     - name: Setup Java
-  #       uses: actions/setup-java@v4
-  #       with:
-  #         distribution: 'temurin'
-  #         java-version: '17'
-  #     - name: Setup Android SDK
-  #       uses: android-actions/setup-android@v3
-  #     - name: Install dependencies
-  #       run: npm ci
-  #     - name: Build Android APK
-  #       run: |
-  #         npx expo install --fix
-  #         npx eas build --platform android --non-interactive --no-wait
-  #       env:
-  #         EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+#     - name: Setup Pages
+#       uses: actions/configure-pages@v4
 
-  # build-ios:
-  #   name: Build iOS
-  #   runs-on: macos-latest
-  #   if: github.ref == 'refs/heads/main' && secrets.EXPO_TOKEN
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '18'
-  #         cache: 'npm'
-  #     - name: Install dependencies
-  #       run: npm ci
-  #     - name: Build iOS
-  #       run: |
-  #         npx expo install --fix
-  #         npx eas build --platform ios --non-interactive --no-wait
-  #       env:
-  #         EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+#     - name: Upload artifact
+#       uses: actions/upload-pages-artifact@v3
+#       with:
+#         path: ./dist
 
-  # deploy-web:
-  #   name: Deploy Web
-  #   runs-on: ubuntu-latest
-  #   if: github.ref == 'refs/heads/main'
-  #   # Disabled - using Vercel for deployment instead of GitHub Pages
-
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '18'
-  #         cache: 'npm'
-
-  #     - name: Install dependencies
-  #       run: npm ci
-
-  #     - name: Build web app
-  #       run: npx expo export --platform web --output-dir dist
-
-  #     - name: Setup Pages
-  #       uses: actions/configure-pages@v4
-
-  #     - name: Upload artifact
-  #       uses: actions/upload-pages-artifact@v3
-  #       with:
-  #         path: ./dist
-
-  #     - name: Deploy to GitHub Pages
-  #       id: deployment
-  #       uses: actions/deploy-pages@v4
+#     - name: Deploy to GitHub Pages
+#       id: deployment
+#       uses: actions/deploy-pages@v4

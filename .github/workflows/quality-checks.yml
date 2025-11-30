@@ -1,0 +1,53 @@
+name: Quality Checks
+
+on:
+  push:
+    branches: [main, 'feature/**']
+  pull_request:
+    # Quality Checks bei PRs zu main UND von Feature-Branches
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality-checks:
+    uses: ./.github/workflows/reusable-quality-checks.yml
+    # Skip if only documentation files changed
+    # head_commit.message ist nur bei push/PR verfügbar, nicht bei workflow_dispatch
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.head_commit &&
+       !contains(github.event.head_commit.message, '[skip ci]') &&
+       !contains(github.event.head_commit.message, '[docs only]'))
+    with:
+      skip_build_check: false
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    # head_commit.message ist nur bei push/PR verfügbar, nicht bei workflow_dispatch
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.head_commit && !contains(github.event.head_commit.message, '[skip ci]'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Security audit
+        run: npm audit --audit-level moderate
+
+      - name: Check for known vulnerabilities
+        run: npx audit-ci --config audit-ci.json
