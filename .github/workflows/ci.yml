@@ -14,35 +14,11 @@ permissions:
 
 jobs:
   quality-checks:
-    name: Code Quality & Testing
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/reusable-quality-checks.yml
     # Skip if only documentation files changed
     if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, '[docs only]')"
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Type checking
-        run: npm run type-check
-
-      - name: Linting
-        run: npm run lint
-
-      - name: Code formatting check
-        run: npm run format:check
-
-      - name: Build check
-        run: npx expo export --platform web --output-dir dist
+    with:
+      skip_build_check: false
 
   security-audit:
     name: Security Audit

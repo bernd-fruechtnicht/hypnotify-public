@@ -1,0 +1,46 @@
+name: Deploy Android
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+
+permissions:
+  contents: read
+
+jobs:
+  quality-checks:
+    uses: ./.github/workflows/reusable-quality-checks.yml
+    with:
+      skip_build_check: true
+
+  build-android:
+    name: Build Android
+    needs: quality-checks
+    uses: ./.github/workflows/reusable-eas-build.yml
+    # Build nur bei [deploy android] auf main oder manuell
+    if: |
+      (github.ref == 'refs/heads/main' && 
+       (contains(github.event.head_commit.message, '[deploy android]') ||
+        contains(github.event.head_commit.message, '[deploy]'))) ||
+      github.event_name == 'workflow_dispatch'
+    with:
+      platform: 'android'
+      profile: ${{ github.event.inputs.profile || 'production' }}
+    secrets:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  # Note: Submit to Play Store is done manually via:
+  # npx eas-cli submit --platform android --profile production
+  # 
+  # Note: Lokale Builds sind weiterhin möglich:
+  # npx eas-cli build --platform android --profile production

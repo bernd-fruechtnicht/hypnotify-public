@@ -1,0 +1,49 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment (ignores commit message)'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  quality-checks:
+    uses: ./.github/workflows/reusable-quality-checks.yml
+    with:
+      skip_build_check: false
+
+  deploy-web:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    # Deploy nur bei [deploy web] auf main oder manuell
+    if: |
+      (github.ref == 'refs/heads/main' && 
+       (contains(github.event.head_commit.message, '[deploy web]') ||
+        contains(github.event.head_commit.message, '[deploy]'))) ||
+      github.event.inputs.force_deploy == 'true' ||
+      github.event_name == 'workflow_dispatch'
+    environment:
+      name: Production – hypnotify
+      # Optional: Protection rules aktivieren für zusätzliche Sicherheit
+    
+    steps:
+      - name: Trigger Vercel Deploy Hook
+        run: |
+          if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
+            echo "⚠️  VERCEL_DEPLOY_HOOK secret is not set. Please create a Deploy Hook in Vercel and add it as a GitHub secret."
+            exit 1
+          fi
+          curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
+
+  # Note: Vercel Git Integration ist deaktiviert (vercel.json)
+  # Deployment erfolgt nur via Deploy Hook bei [deploy web] Commit-Message
+  # Lokale Deployments sind weiterhin möglich: vercel deploy --prod

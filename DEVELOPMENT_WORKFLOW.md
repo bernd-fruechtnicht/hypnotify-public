@@ -109,15 +109,41 @@ docs: update development workflow documentation
 
 ## Deployment Strategy
 
-### Automatic Deployments
+### Trunk-Based Development
 
-- **Feature branches** → Preview deployments (for testing)
-- **Main branch** → Production deployment (after PR merge)
+- **`main`** is the single source of truth
+- All features are merged to `main` via Pull Requests
+- **No automatic deployments** - deployments are explicitly triggered via commit messages
+
+### Deployment Control via Commit Messages
+
+Deployments are triggered by specific commit messages on the `main` branch:
+
+```bash
+# Deploy Web (Vercel)
+git commit --allow-empty -m "chore: [deploy web]"
+git push origin main
+
+# Deploy iOS (EAS Build)
+git commit --allow-empty -m "chore: [deploy ios]"
+git push origin main
+
+# Deploy Android (EAS Build)
+git commit --allow-empty -m "chore: [deploy android]"
+git push origin main
+
+# Deploy all environments
+git commit --allow-empty -m "chore: [deploy]"
+git push origin main
+```
 
 ### Manual Deployments
 
-- Use Vercel CLI for manual deployments when needed
-- Always test in preview environment first
+- **GitHub Actions**: Use `workflow_dispatch` to manually trigger deployments from any branch
+- **Local Builds**: Always possible via CLI:
+  - Web: `vercel deploy --prod`
+  - iOS: `npx eas-cli build --platform ios --profile production`
+  - Android: `npx eas-cli build --platform android --profile production`
 
 ## Emergency Hotfixes
 
@@ -155,13 +181,14 @@ git checkout -b hotfix/critical-issue
 
 ## Build Minutes Conservation
 
-To preserve Vercel build minutes:
+To preserve build minutes:
 
 - Use feature branches for all development
 - Test locally before pushing
-- Only merge to main when ready for production
-- Use preview deployments for testing
-- Avoid unnecessary commits and pushes
+- Only merge to `main` when ready
+- **Deployments are explicit** - no automatic deployments
+- Use commit messages `[deploy ...]` only when ready to deploy
+- Manual deployments via GitHub Actions `workflow_dispatch` for testing
 
 ## Local Development Setup
 
