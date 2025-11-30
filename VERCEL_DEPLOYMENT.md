@@ -17,6 +17,16 @@ You'll need to set these in Vercel's dashboard:
 - `EXPO_PUBLIC_SUPABASE_FUNCTION_URL`: Your Supabase Edge Function URL
 - `EXPO_PUBLIC_SUPABASE_API_KEY`: Your Supabase API key
 
+### Legal Information (Impressum) Variables:
+
+For the legal information page, set these in Vercel:
+
+- `EXPO_PUBLIC_LEGAL_OPERATOR`: Your name or company name (e.g., "John Doe")
+- `EXPO_PUBLIC_LEGAL_ADDRESS`: Your address (e.g., "Hamburg / Deutschland")
+- `EXPO_PUBLIC_LEGAL_EMAIL`: Your contact email (e.g., "info@example.com")
+
+**Note**: These are required for public apps in Germany/EU. If not set, placeholder values will be used.
+
 ### How to Get These Values:
 
 1. **Supabase Function URL**:

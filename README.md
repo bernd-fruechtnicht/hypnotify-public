@@ -187,7 +187,9 @@ This repository contains the frontend application code only. Backend services (T
 
 ### Environment Variables
 
-To use cloud-based TTS features, you need to configure the following environment variables (see `.env.example` for template):
+#### TTS/Backend Services
+
+To use cloud-based TTS features, you need to configure the following environment variables:
 
 - `EXPO_PUBLIC_SUPABASE_FUNCTION_URL`: URL to your TTS synthesis service endpoint
 - `EXPO_PUBLIC_SUPABASE_API_KEY`: API key for authentication
@@ -198,6 +200,23 @@ To use cloud-based TTS features, you need to configure the following environment
 - You can implement your own backend services following the same interface
 - For local development, the app will fall back to device-native TTS capabilities
 - Backend API interface documentation will be added in a future update
+
+#### Legal Information (Impressum)
+
+For deployments (Vercel, EAS Build, etc.), configure your legal information via environment variables:
+
+- `EXPO_PUBLIC_LEGAL_OPERATOR`: Your name or company name
+- `EXPO_PUBLIC_LEGAL_ADDRESS`: Your address (e.g., "City / Country")
+- `EXPO_PUBLIC_LEGAL_EMAIL`: Your contact email
+
+**For local development**, you can:
+
+1. Copy `src/config/legal.config.template.ts` to `src/config/legal.config.ts`
+2. Fill in your information (this file is in `.gitignore` and won't be committed)
+
+**For Vercel deployments**, add these as Environment Variables in the Vercel dashboard.
+
+**For EAS Build**, use `npx eas-cli env:create` or add them to your build profile in `eas.json`.
 
 ## 🗺️ Roadmap
 

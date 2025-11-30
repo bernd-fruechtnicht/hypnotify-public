@@ -16,9 +16,13 @@
    - Gehe zu [vercel.com](https://vercel.com)
    - Prüfe, ob das Repository verbunden ist
    - Prüfe, ob `main` Branch als Production Branch konfiguriert ist
-   - Prüfe Environment Variables:
-     - `EXPO_PUBLIC_SUPABASE_FUNCTION_URL`
-     - `EXPO_PUBLIC_SUPABASE_API_KEY`
+
+- Prüfe Environment Variables:
+  - `EXPO_PUBLIC_SUPABASE_FUNCTION_URL`
+  - `EXPO_PUBLIC_SUPABASE_API_KEY`
+  - `EXPO_PUBLIC_LEGAL_OPERATOR` (für Impressum)
+  - `EXPO_PUBLIC_LEGAL_ADDRESS` (für Impressum)
+  - `EXPO_PUBLIC_LEGAL_EMAIL` (für Impressum)
 
 2. **Test nach Merge:**
    - Merge `feature/demo-preparation` → `main`
@@ -43,6 +47,7 @@ vercel --prod
 - ✅ EAS CLI installiert: `npm install -g eas-cli`
 - ✅ Expo Account: `eas login`
 - ✅ Projekt konfiguriert: `eas.json` vorhanden
+- ✅ Legal-Informationen konfiguriert (siehe unten)
 
 ### Build-Befehle
 
@@ -59,6 +64,59 @@ eas build --platform android --profile preview
 # AAB für Play Store Submission
 eas build --platform android --profile production
 ```
+
+### Legal-Informationen für EAS Build konfigurieren
+
+Vor dem Build müssen die Legal-Informationen als EAS Secrets gesetzt werden:
+
+```bash
+# Legal-Informationen als Environment Variables setzen
+# Für alle Environments (production, preview, development):
+npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Ihr Name" --scope project --visibility plaintext
+npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Ihr Name" --scope project --visibility plaintext
+npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Ihr Name" --scope project --visibility plaintext
+
+npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_ADDRESS --value "Ihre Stadt / Ihr Land" --scope project --visibility plaintext
+npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_ADDRESS --value "Ihre Stadt / Ihr Land" --scope project --visibility plaintext
+npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_ADDRESS --value "Ihre Stadt / Ihr Land" --scope project --visibility plaintext
+
+npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_EMAIL --value "ihre-email@example.com" --scope project --visibility sensitive
+npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_EMAIL --value "ihre-email@example.com" --scope project --visibility sensitive
+npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_EMAIL --value "ihre-email@example.com" --scope project --visibility sensitive
+```
+
+**Oder interaktiv (wird nach Environment gefragt - wähle alle aus):**
+
+```bash
+npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Ihr Name" --scope project --visibility plaintext
+npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_ADDRESS --value "Ihre Stadt / Ihr Land" --scope project --visibility plaintext
+npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_EMAIL --value "ihre-email@example.com" --scope project --visibility sensitive
+```
+
+**Hinweis**:
+
+- Falls EAS CLI global installiert ist (`npm install -g eas-cli`), kann `npx eas-cli` durch `eas` ersetzt werden.
+- `--visibility plaintext` für öffentliche Daten (Name, Adresse)
+- `--visibility sensitive` für E-Mail (empfohlen)
+- Verfügbare Werte: `plaintext`, `sensitive`, `secret`
+
+**Oder** in `eas.json` unter dem jeweiligen Profile:
+
+```json
+{
+  "build": {
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_LEGAL_OPERATOR": "Ihr Name",
+        "EXPO_PUBLIC_LEGAL_ADDRESS": "Ihre Stadt / Ihr Land",
+        "EXPO_PUBLIC_LEGAL_EMAIL": "ihre-email@example.com"
+      }
+    }
+  }
+}
+```
+
+**Hinweis**: Für öffentliche Repos: Verwende EAS Secrets, nicht `eas.json` (um persönliche Daten nicht zu committen).
 
 ### Build-Prozess
 
@@ -92,6 +150,7 @@ eas build --platform android --profile production
 - [ ] Settings werden gespeichert
 - [ ] Navigation funktioniert
 - [ ] Alle Sprachen funktionieren (DE, EN, ZH)
+- [ ] Legal-Informationen korrekt angezeigt (Settings → Legal Information)
 
 ---
 
@@ -177,6 +236,7 @@ npx expo start --tunnel --clear
 - ✅ Production Profile konfiguriert
 - ✅ Android: `buildType: "apk"` (für lokale Tests) oder `"aab"` (für Play Store)
 - ✅ iOS: Standard-Konfiguration
+- ✅ Legal-Informationen: EAS Environment Variables gesetzt (für öffentliche Repos) oder in `eas.json` (nur für private Repos)
 
 ### Build-Prozess für App Stores
 
@@ -251,6 +311,16 @@ eas submit --platform android --profile production
 - [ ] Age Rating ausgefüllt
 - [ ] Pricing & Distribution konfiguriert
 
+#### Legal Information (Impressum)
+
+- [ ] Legal-Informationen konfiguriert:
+  - [ ] Vercel: Environment Variables gesetzt (`EXPO_PUBLIC_LEGAL_*`)
+  - [ ] EAS Build: Environment Variables gesetzt (`npx eas-cli env:create`) oder in `eas.json` konfiguriert
+  - [ ] Lokal: `src/config/legal.config.ts` erstellt (nicht committed)
+- [ ] Impressum in App erreichbar (Settings → Legal Information)
+- [ ] Alle Angaben korrekt (Name, Adresse, E-Mail)
+- [ ] Disclaimer und Warnungen vorhanden
+
 #### Testing
 
 - [ ] iOS: TestFlight Beta-Testing durchgeführt
@@ -306,6 +376,12 @@ eas submit --platform android --profile production
   - **Lösung**: Prüfe `eas.json` Konfiguration
   - **Lösung**: Prüfe Expo Account Login: `eas whoami`
 
+- **Problem**: Legal-Informationen fehlen oder zeigen Platzhalter
+  - **Lösung**: Prüfe EAS Environment Variables: `npx eas-cli env:list`
+  - **Lösung**: Falls Variable als "secret" existiert: `npx eas-cli env:delete production --variable-name EXPO_PUBLIC_LEGAL_OPERATOR` (für alle Environments: production, preview, development)
+  - **Lösung**: Dann neu erstellen: `npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Ihr Name" --scope project --visibility plaintext` (für alle Environments wiederholen)
+  - **Lösung**: Für private Repos: Prüfe `eas.json` → `env` Section im jeweiligen Profile
+
 ### iOS Expo Go
 
 - **Problem**: App lädt nicht
@@ -328,3 +404,8 @@ eas submit --platform android --profile production
 - **Android**: Preview Build für lokale Tests, Production Build für Play Store
 - **iOS**: Expo Go für initiales Testing, Development Build für vollständige Tests
 - **App Stores**: Submission erst nach erfolgreichen Tests auf allen Plattformen
+- **Legal Information**:
+  - Für Vercel: Environment Variables in Dashboard setzen
+  - Für EAS Build: Environment Variables via `npx eas-cli env:create` oder in `eas.json`
+  - Für lokale Entwicklung: `src/config/legal.config.ts` erstellen (Template vorhanden)
+  - **Wichtig**: `legal.config.ts` ist in `.gitignore` und wird nicht committed

@@ -34,6 +34,9 @@ yarn-error.*
 .env
 .env*.local
 
+# Legal information config (contains personal data)
+src/config/legal.config.ts
+
 # typescript
 *.tsbuildinfo
 

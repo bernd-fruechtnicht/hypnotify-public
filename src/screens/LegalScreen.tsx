@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Linking } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { StandardHeader } from '../components/StandardHeader';
 import { logger } from '../utils/logger';
+import { legalInfo } from '../config/legal.config';
 
 interface LegalScreenProps {
   onBack?: () => void;
@@ -13,7 +14,7 @@ export const LegalScreen: React.FC<LegalScreenProps> = ({ onBack }) => {
   const currentLanguage = i18n.language;
 
   const handleEmailPress = () => {
-    const email = 'info@hypnohh.online';
+    const email = legalInfo.email;
     const subject = encodeURIComponent(
       t('legal.contactSubject', 'Contact Hypnotify')
     );
@@ -42,12 +43,12 @@ export const LegalScreen: React.FC<LegalScreenProps> = ({ onBack }) => {
 
           <View style={styles.infoBlock}>
             <Text style={styles.label}>{t('legal.operator', 'Operator')}:</Text>
-            <Text style={styles.value}>Bernd Früchtnicht</Text>
+            <Text style={styles.value}>{legalInfo.operator}</Text>
           </View>
 
           <View style={styles.infoBlock}>
             <Text style={styles.label}>{t('legal.address', 'Address')}:</Text>
-            <Text style={styles.value}>Hamburg / Deutschland</Text>
+            <Text style={styles.value}>{legalInfo.address}</Text>
           </View>
 
           <View style={styles.infoBlock}>
@@ -56,7 +57,7 @@ export const LegalScreen: React.FC<LegalScreenProps> = ({ onBack }) => {
               style={[styles.value, styles.link]}
               onPress={handleEmailPress}
             >
-              info@hypnohh.online
+              {legalInfo.email}
             </Text>
           </View>
         </View>
