@@ -34,8 +34,9 @@ yarn-error.*
 .env
 .env*.local
 
-# Legal information config (contains personal data)
-src/config/legal.config.ts
+# Legal information config - committed with placeholders
+# Users can override locally if needed, but CI/CD needs the file
+# src/config/legal.config.ts
 
 # typescript
 *.tsbuildinfo

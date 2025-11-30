@@ -12,11 +12,11 @@ Im Vercel Dashboard → Settings → Environment Variables folgende Variablen an
 
 ### Production Environment
 
-| Variable Name                | Value                   |
-| ---------------------------- | ----------------------- |
-| `EXPO_PUBLIC_LEGAL_OPERATOR` | `Bernd Früchtnicht`     |
-| `EXPO_PUBLIC_LEGAL_ADDRESS`  | `Hamburg / Deutschland` |
-| `EXPO_PUBLIC_LEGAL_EMAIL`    | `info@hypnohh.online`   |
+| Variable Name                | Value                      |
+| ---------------------------- | -------------------------- |
+| `EXPO_PUBLIC_LEGAL_OPERATOR` | `YOUR_NAME_HERE`           |
+| `EXPO_PUBLIC_LEGAL_ADDRESS`  | `YOUR_CITY / YOUR_COUNTRY` |
+| `EXPO_PUBLIC_LEGAL_EMAIL`    | `your-email@example.com`   |
 
 ### Vorgehen in Vercel:
 
@@ -24,7 +24,7 @@ Im Vercel Dashboard → Settings → Environment Variables folgende Variablen an
 2. Settings → Environment Variables
 3. Für jedes Variable:
    - **Name**: `EXPO_PUBLIC_LEGAL_OPERATOR` (usw.)
-   - **Value**: `Bernd Früchtnicht` (usw.)
+   - **Value**: `YOUR_NAME_HERE` (usw.)
    - **Environment**: `Production` (und optional `Preview`, `Development`)
    - **Add** klicken
 
@@ -68,27 +68,27 @@ npx eas-cli env:delete --variable-name EXPO_PUBLIC_LEGAL_EMAIL
 
 ```bash
 # Operator (Name) - für alle Environments
-npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Bernd Früchtnicht" --scope project --visibility plaintext
-npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Bernd Früchtnicht" --scope project --visibility plaintext
-npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Bernd Früchtnicht" --scope project --visibility plaintext
+npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_OPERATOR --value "YOUR_NAME_HERE" --scope project --visibility plaintext
+npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_OPERATOR --value "YOUR_NAME_HERE" --scope project --visibility plaintext
+npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_OPERATOR --value "YOUR_NAME_HERE" --scope project --visibility plaintext
 
 # Address - für alle Environments
-npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_ADDRESS --value "Hamburg / Deutschland" --scope project --visibility plaintext
-npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_ADDRESS --value "Hamburg / Deutschland" --scope project --visibility plaintext
-npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_ADDRESS --value "Hamburg / Deutschland" --scope project --visibility plaintext
+npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_ADDRESS --value "YOUR_CITY / YOUR_COUNTRY" --scope project --visibility plaintext
+npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_ADDRESS --value "YOUR_CITY / YOUR_COUNTRY" --scope project --visibility plaintext
+npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_ADDRESS --value "YOUR_CITY / YOUR_COUNTRY" --scope project --visibility plaintext
 
 # Email - für alle Environments
-npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_EMAIL --value "info@hypnohh.online" --scope project --visibility sensitive
-npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_EMAIL --value "info@hypnohh.online" --scope project --visibility sensitive
-npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_EMAIL --value "info@hypnohh.online" --scope project --visibility sensitive
+npx eas-cli env:create production --name EXPO_PUBLIC_LEGAL_EMAIL --value "your-email@example.com" --scope project --visibility sensitive
+npx eas-cli env:create preview --name EXPO_PUBLIC_LEGAL_EMAIL --value "your-email@example.com" --scope project --visibility sensitive
+npx eas-cli env:create development --name EXPO_PUBLIC_LEGAL_EMAIL --value "your-email@example.com" --scope project --visibility sensitive
 ```
 
 **Oder interaktiv (wird nach Environment gefragt - wähle alle aus):**
 
 ```bash
-npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_OPERATOR --value "Bernd Früchtnicht" --scope project --visibility plaintext
-npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_ADDRESS --value "Hamburg / Deutschland" --scope project --visibility plaintext
-npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_EMAIL --value "info@hypnohh.online" --scope project --visibility sensitive
+npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_OPERATOR --value "YOUR_NAME_HERE" --scope project --visibility plaintext
+npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_ADDRESS --value "YOUR_CITY / YOUR_COUNTRY" --scope project --visibility plaintext
+npx eas-cli env:create --name EXPO_PUBLIC_LEGAL_EMAIL --value "your-email@example.com" --scope project --visibility sensitive
 ```
 
 **Hinweis**:
