@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as Localization from 'expo-localization';
 import i18n from '../services/i18n';
+import { logger } from '../utils/logger';
 
 interface LanguageContextType {
   currentLanguage: string;

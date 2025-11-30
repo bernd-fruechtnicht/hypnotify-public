@@ -5,6 +5,7 @@
  */
 
 import { WebAudioHandler } from './WebAudioHandler';
+import { logger } from '../../utils/logger';
 
 export class IOSWebAudioHandler extends WebAudioHandler {
   private isIOSWeb = false;

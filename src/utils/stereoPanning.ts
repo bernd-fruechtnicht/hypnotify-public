@@ -3,6 +3,8 @@
  * This handles stereo panning without requiring server-side FFmpeg
  */
 
+import { logger } from './logger';
+
 export interface StereoPanningOptions {
   /** Audio data as base64 string */
   audioData: string;

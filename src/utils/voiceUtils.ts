@@ -3,6 +3,8 @@
  * Shared logic for filtering voices by language across all TTS services
  */
 
+import { logger } from './logger';
+
 /**
  * Filter voices by language using simple prefix matching
  * Handles language codes like: en, en-US, en_GB, zh-CN, de-DE, etc.

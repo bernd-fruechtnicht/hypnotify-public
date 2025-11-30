@@ -5,6 +5,7 @@ import {
   TTSErrorType,
 } from '../types';
 import { storageService } from './StorageService';
+import { logger } from '../utils/logger';
 
 /**
  * Electron-specific TTS service that uses system TTS via IPC
@@ -84,198 +85,202 @@ export class ElectronTTSService {
             error: undefined,
           });
 
-        // Load user settings from storage
-        let appSettings = null;
-        try {
-          appSettings = await storageService.loadSettings();
-          logger.debug('ElectronTTSService: Loaded app settings:', appSettings);
-        } catch (error) {
+          // Load user settings from storage
+          let appSettings = null;
+          try {
+            appSettings = await storageService.loadSettings();
+            logger.debug(
+              'ElectronTTSService: Loaded app settings:',
+              appSettings
+            );
+          } catch (error) {
+            logger.debug(
+              'ElectronTTSService: Failed to load app settings, using defaults:',
+              error
+            );
+          }
+
+          // Use the language from config (statement language) or fall back to app settings
+          const targetLanguage =
+            config.language || appSettings?.language || 'en';
           logger.debug(
-            'ElectronTTSService: Failed to load app settings, using defaults:',
-            error
+            'ElectronTTSService: Target language (from statement):',
+            targetLanguage
           );
-        }
 
-        // Use the language from config (statement language) or fall back to app settings
-        const targetLanguage = config.language || appSettings?.language || 'en';
-        logger.debug(
-          'ElectronTTSService: Target language (from statement):',
-          targetLanguage
-        );
+          // Select the best voice for the target language
+          // Prioritize voicesPerLanguage over defaultVoice
+          let selectedVoice = 'default';
+          if (config.voice) {
+            selectedVoice = config.voice;
+          } else if (appSettings?.tts?.voicesPerLanguage?.[targetLanguage]) {
+            selectedVoice = appSettings.tts.voicesPerLanguage[targetLanguage];
+          } else if (appSettings?.tts?.defaultVoice) {
+            selectedVoice = appSettings.tts.defaultVoice;
+          }
 
-        // Select the best voice for the target language
-        // Prioritize voicesPerLanguage over defaultVoice
-        let selectedVoice = 'default';
-        if (config.voice) {
-          selectedVoice = config.voice;
-        } else if (appSettings?.tts?.voicesPerLanguage?.[targetLanguage]) {
-          selectedVoice = appSettings.tts.voicesPerLanguage[targetLanguage];
-        } else if (appSettings?.tts?.defaultVoice) {
-          selectedVoice = appSettings.tts.defaultVoice;
-        }
+          logger.debug('ElectronTTSService: Voice selection debug:', {
+            targetLanguage,
+            voicesPerLanguage: appSettings?.tts?.voicesPerLanguage,
+            selectedVoice,
+            defaultVoice: appSettings?.tts?.defaultVoice,
+          });
 
-        logger.debug('ElectronTTSService: Voice selection debug:', {
-          targetLanguage,
-          voicesPerLanguage: appSettings?.tts?.voicesPerLanguage,
-          selectedVoice,
-          defaultVoice: appSettings?.tts?.defaultVoice,
-        });
+          // For English, try to select a specific English voice
+          if (targetLanguage.startsWith('en') && selectedVoice === 'default') {
+            // Common English voice names in Windows (exact names as they appear in the system)
+            const englishVoices = [
+              'Microsoft David Desktop',
+              'Microsoft Zira Desktop',
+              'Microsoft Mark Desktop',
+              'Microsoft David',
+              'Microsoft Zira',
+              'Microsoft Mark',
+              'Microsoft Hazel Desktop',
+              'Microsoft Susan Desktop',
+            ];
 
-        // For English, try to select a specific English voice
-        if (targetLanguage.startsWith('en') && selectedVoice === 'default') {
-          // Common English voice names in Windows (exact names as they appear in the system)
-          const englishVoices = [
-            'Microsoft David Desktop',
-            'Microsoft Zira Desktop',
-            'Microsoft Mark Desktop',
-            'Microsoft David',
-            'Microsoft Zira',
-            'Microsoft Mark',
-            'Microsoft Hazel Desktop',
-            'Microsoft Susan Desktop',
-          ];
+            // Use the first English voice as default
+            selectedVoice = englishVoices[0];
+            logger.debug(
+              'ElectronTTSService: Selected English voice:',
+              selectedVoice
+            );
+          } else if (
+            targetLanguage.startsWith('zh') &&
+            selectedVoice === 'default'
+          ) {
+            // Common Chinese voice names in Windows (exact names as they appear in the system)
+            const chineseVoices = [
+              'Microsoft Huihui Desktop',
+              'Microsoft Yaoyao Desktop',
+              'Microsoft Kangkang Desktop',
+              'Microsoft Huihui',
+              'Microsoft Yaoyao',
+              'Microsoft Kangkang',
+            ];
 
-          // Use the first English voice as default
-          selectedVoice = englishVoices[0];
+            // Use the first Chinese voice as default
+            selectedVoice = chineseVoices[0];
+            logger.debug(
+              'ElectronTTSService: Selected Chinese voice:',
+              selectedVoice
+            );
+          } else if (
+            targetLanguage.startsWith('de') &&
+            selectedVoice === 'default'
+          ) {
+            // Common German voice names in Windows (exact names as they appear in the system)
+            const germanVoices = [
+              'Microsoft Hedda Desktop',
+              'Microsoft Katja Desktop',
+              'Microsoft Stefan Desktop',
+              'Microsoft Hedda',
+              'Microsoft Katja',
+              'Microsoft Stefan',
+            ];
+
+            // Use the first German voice as default
+            selectedVoice = germanVoices[0];
+            logger.debug(
+              'ElectronTTSService: Selected German voice:',
+              selectedVoice
+            );
+          }
+
+          // Prepare options for system TTS with user settings
+          const options = {
+            rate: config.rate || appSettings?.tts?.defaultRate || 1.0, // User's custom rate
+            pitch: config.pitch || appSettings?.tts?.defaultPitch || 1.0, // User's custom pitch
+            volume: config.volume || appSettings?.tts?.defaultVolume || 0.8, // User's custom volume
+            voice: selectedVoice, // Selected voice name
+            language: targetLanguage, // Statement language
+          };
+
           logger.debug(
-            'ElectronTTSService: Selected English voice:',
-            selectedVoice
+            'ElectronTTSService: Calling system TTS with options:',
+            options
           );
-        } else if (
-          targetLanguage.startsWith('zh') &&
-          selectedVoice === 'default'
-        ) {
-          // Common Chinese voice names in Windows (exact names as they appear in the system)
-          const chineseVoices = [
-            'Microsoft Huihui Desktop',
-            'Microsoft Yaoyao Desktop',
-            'Microsoft Kangkang Desktop',
-            'Microsoft Huihui',
-            'Microsoft Yaoyao',
-            'Microsoft Kangkang',
-          ];
-
-          // Use the first Chinese voice as default
-          selectedVoice = chineseVoices[0];
           logger.debug(
-            'ElectronTTSService: Selected Chinese voice:',
-            selectedVoice
+            'ElectronTTSService: Parameter conversion for Windows SAPI:'
           );
-        } else if (
-          targetLanguage.startsWith('de') &&
-          selectedVoice === 'default'
-        ) {
-          // Common German voice names in Windows (exact names as they appear in the system)
-          const germanVoices = [
-            'Microsoft Hedda Desktop',
-            'Microsoft Katja Desktop',
-            'Microsoft Stefan Desktop',
-            'Microsoft Hedda',
-            'Microsoft Katja',
-            'Microsoft Stefan',
-          ];
-
-          // Use the first German voice as default
-          selectedVoice = germanVoices[0];
           logger.debug(
-            'ElectronTTSService: Selected German voice:',
-            selectedVoice
+            '  - Rate:',
+            options.rate,
+            '→ SAPI Rate:',
+            Math.round((options.rate - 1) * 10)
           );
-        }
+          logger.debug(
+            '  - Volume:',
+            options.volume,
+            '→ SAPI Volume:',
+            Math.round(options.volume * 100)
+          );
+          logger.debug('  - Pitch:', options.pitch, '(not supported by SAPI)');
+          logger.debug('  - Voice:', options.voice);
+          logger.debug('  - Language:', options.language);
 
-        // Prepare options for system TTS with user settings
-        const options = {
-          rate: config.rate || appSettings?.tts?.defaultRate || 1.0, // User's custom rate
-          pitch: config.pitch || appSettings?.tts?.defaultPitch || 1.0, // User's custom pitch
-          volume: config.volume || appSettings?.tts?.defaultVolume || 0.8, // User's custom volume
-          voice: selectedVoice, // Selected voice name
-          language: targetLanguage, // Statement language
-        };
-
-        logger.debug(
-          'ElectronTTSService: Calling system TTS with options:',
-          options
-        );
-        logger.debug(
-          'ElectronTTSService: Parameter conversion for Windows SAPI:'
-        );
-        logger.debug(
-          '  - Rate:',
-          options.rate,
-          '→ SAPI Rate:',
-          Math.round((options.rate - 1) * 10)
-        );
-        logger.debug(
-          '  - Volume:',
-          options.volume,
-          '→ SAPI Volume:',
-          Math.round(options.volume * 100)
-        );
-        logger.debug('  - Pitch:', options.pitch, '(not supported by SAPI)');
-        logger.debug('  - Voice:', options.voice);
-        logger.debug('  - Language:', options.language);
-
-        // Keep state as loading until TTS actually starts
-        this.updateState({
-          status: TTSPlaybackStatus.LOADING,
-          currentText: text,
-          isLoading: true,
-          error: undefined,
-          currentTime: 0,
-          totalDuration: 1, // Normalized for percentage calculation
-        });
-
-        logger.debug('ElectronTTSService: Starting TTS call...');
-
-        // Wait for TTS to actually start, then update to playing
-        // System TTS needs time to initialize, especially with voice selection
-        setTimeout(() => {
-          logger.debug('ElectronTTSService: TTS should be playing now');
+          // Keep state as loading until TTS actually starts
           this.updateState({
-            status: TTSPlaybackStatus.PLAYING,
-            isLoading: false,
+            status: TTSPlaybackStatus.LOADING,
+            currentText: text,
+            isLoading: true,
+            error: undefined,
+            currentTime: 0,
+            totalDuration: 1, // Normalized for percentage calculation
           });
-        }, 1000); // Give TTS 1 second to start (voice selection + initialization)
 
-        // Call Electron TTS via IPC and wait for it to complete
-        (window as any).electronAPI
-          .ttsSpeak(text, options)
-          .then(() => {
-            logger.debug('ElectronTTSService: TTS completed successfully');
+          logger.debug('ElectronTTSService: Starting TTS call...');
+
+          // Wait for TTS to actually start, then update to playing
+          // System TTS needs time to initialize, especially with voice selection
+          setTimeout(() => {
+            logger.debug('ElectronTTSService: TTS should be playing now');
             this.updateState({
-              status: TTSPlaybackStatus.COMPLETED,
-              currentText: text,
+              status: TTSPlaybackStatus.PLAYING,
               isLoading: false,
-              error: undefined,
-              currentTime: 1,
             });
-            resolve(); // Resolve the Promise when speech completes
-          })
-          .catch((error: any) => {
-            logger.error('ElectronTTSService: TTS error:', error);
-            this.updateState({
-              status: TTSPlaybackStatus.ERROR,
-              error: error.message || 'TTS failed',
+          }, 1000); // Give TTS 1 second to start (voice selection + initialization)
+
+          // Call Electron TTS via IPC and wait for it to complete
+          (window as any).electronAPI
+            .ttsSpeak(text, options)
+            .then(() => {
+              logger.debug('ElectronTTSService: TTS completed successfully');
+              this.updateState({
+                status: TTSPlaybackStatus.COMPLETED,
+                currentText: text,
+                isLoading: false,
+                error: undefined,
+                currentTime: 1,
+              });
+              resolve(); // Resolve the Promise when speech completes
+            })
+            .catch((error: any) => {
+              logger.error('ElectronTTSService: TTS error:', error);
+              this.updateState({
+                status: TTSPlaybackStatus.ERROR,
+                error: error.message || 'TTS failed',
+              });
+              reject(error);
             });
-            reject(error);
+        } catch (error) {
+          logger.error('ElectronTTSService: Speech failed:', error);
+          this.updateState({
+            status: TTSPlaybackStatus.ERROR,
+            currentText: text,
+            isLoading: false,
+            error: {
+              type: TTSErrorType.AUDIO_PLAYBACK_ERROR,
+              message: error instanceof Error ? error.message : 'Unknown error',
+              timestamp: new Date(),
+              isRecoverable: true,
+            },
           });
-      } catch (error) {
-        logger.error('ElectronTTSService: Speech failed:', error);
-        this.updateState({
-          status: TTSPlaybackStatus.ERROR,
-          currentText: text,
-          isLoading: false,
-          error: {
-            type: TTSErrorType.AUDIO_PLAYBACK_ERROR,
-            message: error instanceof Error ? error.message : 'Unknown error',
-            timestamp: new Date(),
-            isRecoverable: true,
-          },
-        });
-        reject(error);
+          reject(error);
         }
       };
-      
+
       executeSpeech();
     }); // Close the Promise
   }

@@ -17,7 +17,17 @@
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
     "verify-translations": "node scripts/verify-translations.js",
-    "translation-report": "node scripts/verify-translations.js --report"
+    "translation-report": "node scripts/verify-translations.js --report",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,jsx,json,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
@@ -54,6 +64,8 @@
     "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
     "node-wav": "^0.0.2",
     "prettier": "^3.6.2",
     "typescript": "~5.9.2"

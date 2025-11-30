@@ -24,6 +24,7 @@ import {
   StereoPlayerService,
   stereoPlayerService,
 } from './StereoPlayerService';
+import { logger } from '../utils/logger';
 
 // Create native TTS service instance
 const nativeTtsService = NativeTTSService.getInstance();
