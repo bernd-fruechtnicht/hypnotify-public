@@ -44,6 +44,6 @@ jobs:
 
   # Note: Submit to Play Store is done manually via:
   # npx eas-cli submit --platform android --profile production
-  # 
+  #
   # Note: Lokale Builds sind weiterhin möglich:
   # npx eas-cli build --platform android --profile production

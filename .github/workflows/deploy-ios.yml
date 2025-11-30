@@ -44,6 +44,6 @@ jobs:
 
   # Note: Submit to App Store Connect is done manually via:
   # npx eas-cli submit --platform ios --profile production
-  # 
+  #
   # Note: Lokale Builds sind weiterhin möglich:
   # npx eas-cli build --platform ios --profile production
