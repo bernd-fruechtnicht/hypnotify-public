@@ -1,18 +1,11 @@
 /**
  * Production-ready logging utility
- * 
+ *
  * - In Development (__DEV__ = true): All logs are shown
  * - In Production (__DEV__ = false): Only warnings and errors are shown
  */
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-
-interface LogEntry {
-  level: LogLevel;
-  message: string;
-  data?: any;
-  timestamp: Date;
-}
 
 class Logger {
   private isDevelopment: boolean;
@@ -80,4 +73,3 @@ export const logger = new Logger();
 
 // Export Logger class for testing
 export { Logger };
-

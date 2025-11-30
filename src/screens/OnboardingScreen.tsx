@@ -199,7 +199,11 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       )}
 
       {/* Content */}
-      <ScrollView ref={scrollViewRef} style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.stepContainer}>
           {/* Icon */}
           <View

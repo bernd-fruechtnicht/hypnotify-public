@@ -166,7 +166,10 @@ export class StereoPlayerService {
         await this.stopPlayback();
       } catch (error) {
         // Ignore errors when stopping previous playback - we'll start fresh anyway
-        logger.debug('StereoPlayerService: Error stopping previous playback, continuing:', error);
+        logger.debug(
+          'StereoPlayerService: Error stopping previous playback, continuing:',
+          error
+        );
       }
     }
 
@@ -223,7 +226,9 @@ export class StereoPlayerService {
         },
       });
 
-      logger.debug('StereoPlayerService: Session playback started successfully');
+      logger.debug(
+        'StereoPlayerService: Session playback started successfully'
+      );
     } catch (error) {
       this.updateState({
         isGenerating: false,
@@ -380,13 +385,16 @@ export class StereoPlayerService {
       this.isStopping = false;
 
       logger.debug('StereoPlayerService: Playback stopped');
-      
+
       // Unload all sounds after resetting state (non-blocking)
       // Don't throw errors here - we've already stopped playback
       try {
         await this.unloadAllSounds();
       } catch (error) {
-        logger.debug('StereoPlayerService: Error unloading sounds after stop (non-critical):', error);
+        logger.debug(
+          'StereoPlayerService: Error unloading sounds after stop (non-critical):',
+          error
+        );
       }
     } catch (error) {
       // Reset state even if stopping failed
@@ -395,7 +403,7 @@ export class StereoPlayerService {
       this.leftChannelIndex = 0;
       this.rightChannelIndex = 0;
       this.isStopping = false;
-      
+
       const apiError = this.createApiError(
         'STOP_FAILED',
         `Failed to stop playback: ${error}`,
@@ -727,7 +735,7 @@ export class StereoPlayerService {
     try {
       // Stop all sounds first
       await this.stopAllSounds();
-      
+
       // Update state
       this.updateState({
         isPlaying: false,
@@ -749,7 +757,7 @@ export class StereoPlayerService {
       }
 
       this.updatePerformanceMetrics(true);
-      
+
       // Clean up sounds after a short delay to allow final audio to finish
       setTimeout(async () => {
         await this.unloadAllSounds();
@@ -863,7 +871,7 @@ export class StereoPlayerService {
       ...this.leftChannelSounds.values(),
       ...this.rightChannelSounds.values(),
     ];
-    
+
     // Stop all sounds safely, ignoring errors for non-existent players
     await Promise.all(
       allSounds.map(async sound => {
@@ -872,9 +880,11 @@ export class StereoPlayerService {
           if (status.isLoaded) {
             await sound.stopAsync();
           }
-        } catch (error) {
+        } catch {
           // Ignore errors for non-existent or already unloaded players
-          logger.debug('StereoPlayerService: Sound already stopped or unloaded');
+          logger.debug(
+            'StereoPlayerService: Sound already stopped or unloaded'
+          );
         }
       })
     );
@@ -885,7 +895,7 @@ export class StereoPlayerService {
       ...this.leftChannelSounds.values(),
       ...this.rightChannelSounds.values(),
     ];
-    
+
     // Unload all sounds safely, ignoring errors for non-existent or already unloaded players
     await Promise.all(
       allSounds.map(async sound => {
@@ -894,13 +904,15 @@ export class StereoPlayerService {
           if (status.isLoaded) {
             await sound.unloadAsync();
           }
-        } catch (error) {
+        } catch {
           // Ignore errors for non-existent or already unloaded players
-          logger.debug('StereoPlayerService: Sound already unloaded or does not exist');
+          logger.debug(
+            'StereoPlayerService: Sound already unloaded or does not exist'
+          );
         }
       })
     );
-    
+
     this.leftChannelSounds.clear();
     this.rightChannelSounds.clear();
   }

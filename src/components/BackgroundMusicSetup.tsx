@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { logger } from '../utils/logger';
 import { storageService, backgroundMusicService } from '../services';
@@ -10,7 +17,9 @@ interface BackgroundMusicSetupProps {
   scrollViewRef?: React.RefObject<ScrollView | null>;
 }
 
-export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scrollViewRef }) => {
+export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({
+  scrollViewRef,
+}) => {
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
   const [settings, setSettings] = useState<AppSettings | null>(null);

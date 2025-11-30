@@ -371,7 +371,10 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
       try {
         await ttsService.stop();
       } catch (error) {
-        logger.debug('Stop error in handleStatementComplete (ignoring):', error);
+        logger.debug(
+          'Stop error in handleStatementComplete (ignoring):',
+          error
+        );
       }
 
       // Clean up listener

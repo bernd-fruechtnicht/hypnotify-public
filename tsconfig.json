@@ -7,9 +7,5 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
-  "exclude": [
-    "supabase/**/*",
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["supabase/**/*", "node_modules", "dist"]
 }

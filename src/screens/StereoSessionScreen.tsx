@@ -322,48 +322,58 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
       }
 
       // Get breathing statements for left channel (rational, no counting)
-      const breathingStatements = allStatements.filter(s => 
-        s.primaryTag === 'breathing' || s.tags.includes('breathing')
+      const breathingStatements = allStatements.filter(
+        s => s.primaryTag === 'breathing' || s.tags.includes('breathing')
       );
       const leftChannelStatements = breathingStatements.filter(s => {
         // Check all languages in multiLanguageContent
         const allTexts = [
           s.text,
-          ...Object.values(s.multiLanguageContent || {}).map(c => c.text)
-        ].join(' ').toLowerCase();
-        
-        return !allTexts.includes('count') &&
-               !allTexts.includes('one') &&
-               !allTexts.includes('two') &&
-               !allTexts.includes('three') &&
-               !allTexts.includes('four') &&
-               !allTexts.includes('five') &&
-               !allTexts.includes('six') &&
-               !allTexts.includes('seven') &&
-               !allTexts.includes('eight') &&
-               !allTexts.includes('nine') &&
-               !allTexts.includes('ten') &&
-               !allTexts.includes('eins') &&
-               !allTexts.includes('zwei') &&
-               !allTexts.includes('drei') &&
-               !allTexts.includes('vier') &&
-               !allTexts.includes('fünf');
+          ...Object.values(s.multiLanguageContent || {}).map(c => c.text),
+        ]
+          .join(' ')
+          .toLowerCase();
+
+        return (
+          !allTexts.includes('count') &&
+          !allTexts.includes('one') &&
+          !allTexts.includes('two') &&
+          !allTexts.includes('three') &&
+          !allTexts.includes('four') &&
+          !allTexts.includes('five') &&
+          !allTexts.includes('six') &&
+          !allTexts.includes('seven') &&
+          !allTexts.includes('eight') &&
+          !allTexts.includes('nine') &&
+          !allTexts.includes('ten') &&
+          !allTexts.includes('eins') &&
+          !allTexts.includes('zwei') &&
+          !allTexts.includes('drei') &&
+          !allTexts.includes('vier') &&
+          !allTexts.includes('fünf')
+        );
       });
-      const leftStatementIds = (leftChannelStatements.length >= 10 
-        ? leftChannelStatements 
-        : breathingStatements).slice(0, 10).map(s => s.id);
+      const leftStatementIds = (
+        leftChannelStatements.length >= 10
+          ? leftChannelStatements
+          : breathingStatements
+      )
+        .slice(0, 10)
+        .map(s => s.id);
 
       // Get mindfulness statements for right channel (emotional/awareness)
-      const mindfulnessStatements = allStatements.filter(s => 
-        s.primaryTag === 'mindfulness' || s.tags.includes('mindfulness')
+      const mindfulnessStatements = allStatements.filter(
+        s => s.primaryTag === 'mindfulness' || s.tags.includes('mindfulness')
       );
       const rightChannelStatements = mindfulnessStatements.filter(s => {
         // Check all languages in multiLanguageContent
         const allTexts = [
           s.text,
-          ...Object.values(s.multiLanguageContent || {}).map(c => c.text)
-        ].join(' ').toLowerCase();
-        
+          ...Object.values(s.multiLanguageContent || {}).map(c => c.text),
+        ]
+          .join(' ')
+          .toLowerCase();
+
         return (
           allTexts.includes('feel') ||
           allTexts.includes('ich fühle') ||
@@ -378,9 +388,13 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
           allTexts.includes('beobachte')
         );
       });
-      const rightStatementIds = (rightChannelStatements.length >= 10 
-        ? rightChannelStatements 
-        : mindfulnessStatements).slice(0, 10).map(s => s.id);
+      const rightStatementIds = (
+        rightChannelStatements.length >= 10
+          ? rightChannelStatements
+          : mindfulnessStatements
+      )
+        .slice(0, 10)
+        .map(s => s.id);
 
       logger.debug(
         'StereoSessionScreen: Found left channel statements:',

@@ -148,12 +148,12 @@ export class CloudTTSService {
 
     // Check configuration early and provide clear error message
     if (!this.config.endpoint || !this.config.endpoint.trim()) {
-      const errorMessage = 
+      const errorMessage =
         'Supabase Edge Function endpoint not configured. ' +
         'Please set EXPO_PUBLIC_SUPABASE_FUNCTION_URL in your .env file for local development, ' +
         'or configure it in your deployment environment (e.g., Vercel). ' +
         'See STEREO_SETUP.md for setup instructions.';
-      
+
       const apiError = this.createApiError(
         'CONFIGURATION_MISSING',
         errorMessage,
@@ -597,10 +597,7 @@ export class CloudTTSService {
       try {
         listener(error);
       } catch (listenerError) {
-        logger.error(
-          'Error in CloudTTSService error listener:',
-          listenerError
-        );
+        logger.error('Error in CloudTTSService error listener:', listenerError);
       }
     });
   }
@@ -622,10 +619,7 @@ export class CloudTTSService {
       // TODO: Implement cache loading from AsyncStorage
       logger.debug('CloudTTSService: Cache loading not yet implemented');
     } catch (error) {
-      logger.warn(
-        'CloudTTSService: Failed to load cache from storage:',
-        error
-      );
+      logger.warn('CloudTTSService: Failed to load cache from storage:', error);
     }
   }
 

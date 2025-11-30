@@ -115,109 +115,111 @@ export class NativeTTSService {
             error: undefined,
           });
 
-        // Load user's app settings
-        let appSettings = null;
-        try {
-          appSettings = await storageService.loadSettings();
-        } catch {
-          // Use defaults if settings can't be loaded
-        }
+          // Load user's app settings
+          let appSettings = null;
+          try {
+            appSettings = await storageService.loadSettings();
+          } catch {
+            // Use defaults if settings can't be loaded
+          }
 
-        // Use the language from config (statement language) or fall back to app settings
-        const targetLanguage = config.language || appSettings?.language || 'en';
+          // Use the language from config (statement language) or fall back to app settings
+          const targetLanguage =
+            config.language || appSettings?.language || 'en';
 
-        // Get voice identifier from config or settings
-        const selectedVoice =
-          config.voice ||
-          appSettings?.tts?.voicesPerLanguage?.[targetLanguage] ||
-          'default';
+          // Get voice identifier from config or settings
+          const selectedVoice =
+            config.voice ||
+            appSettings?.tts?.voicesPerLanguage?.[targetLanguage] ||
+            'default';
 
-        const fullConfig: TTSPlaybackConfig = {
-          voice: selectedVoice,
-          rate: appSettings?.tts?.defaultRate || 1.0,
-          pitch: appSettings?.tts?.defaultPitch || 1.0,
-          volume: appSettings?.tts?.defaultVolume || 0.8,
-          language: targetLanguage,
-          useSSML: false,
-          audioFormat: {
-            codec: 'mp3',
-            bitrate: 128,
-            sampleRate: 22050,
-            channels: 1,
-          },
-          preloadAudio: false,
-          maxPreloadDuration: 30,
-          ...config,
-        };
+          const fullConfig: TTSPlaybackConfig = {
+            voice: selectedVoice,
+            rate: appSettings?.tts?.defaultRate || 1.0,
+            pitch: appSettings?.tts?.defaultPitch || 1.0,
+            volume: appSettings?.tts?.defaultVolume || 0.8,
+            language: targetLanguage,
+            useSSML: false,
+            audioFormat: {
+              codec: 'mp3',
+              bitrate: 128,
+              sampleRate: 22050,
+              channels: 1,
+            },
+            preloadAudio: false,
+            maxPreloadDuration: 30,
+            ...config,
+          };
 
-        // Convert rate to expo-speech format (0.1 to 2.0)
-        const expoRate = Math.max(0.1, Math.min(2.0, fullConfig.rate));
-        const expoPitch = Math.max(0.0, Math.min(2.0, fullConfig.pitch));
-        const expoVolume = Math.max(0.0, Math.min(1.0, fullConfig.volume));
+          // Convert rate to expo-speech format (0.1 to 2.0)
+          const expoRate = Math.max(0.1, Math.min(2.0, fullConfig.rate));
+          const expoPitch = Math.max(0.0, Math.min(2.0, fullConfig.pitch));
+          const expoVolume = Math.max(0.0, Math.min(1.0, fullConfig.volume));
 
-        logger.debug('NativeTTSService: TTS parameters:', {
-          rate: expoRate,
-          pitch: expoPitch,
-          volume: expoVolume,
-          language: fullConfig.language,
-          platform: Platform.OS,
-        });
+          logger.debug('NativeTTSService: TTS parameters:', {
+            rate: expoRate,
+            pitch: expoPitch,
+            volume: expoVolume,
+            language: fullConfig.language,
+            platform: Platform.OS,
+          });
 
-        // Stop any current speech
-        Speech.stop();
+          // Stop any current speech
+          Speech.stop();
 
-        // Set up completion handler
-        const onDone = () => {
+          // Set up completion handler
+          const onDone = () => {
+            this.updateState({
+              status: TTSPlaybackStatus.COMPLETED,
+              isPlaying: false,
+              isPaused: false,
+              currentTime: 1,
+              totalDuration: 1,
+            });
+            resolve();
+          };
+
+          const onError = (error: any) => {
+            const ttsError = this.createError(
+              TTSErrorType.AUDIO_PLAYBACK_ERROR,
+              `Native TTS error: ${error}`
+            );
+            this.handleError(ttsError);
+            reject(ttsError);
+          };
+
+          // Start speech
           this.updateState({
-            status: TTSPlaybackStatus.COMPLETED,
-            isPlaying: false,
-            isPaused: false,
-            currentTime: 1,
+            status: TTSPlaybackStatus.PLAYING,
+            isPlaying: true,
+            isLoading: false,
+            currentText: text,
+            currentTime: 0,
             totalDuration: 1,
           });
-          resolve();
-        };
 
-        const onError = (error: any) => {
-          const ttsError = this.createError(
-            TTSErrorType.AUDIO_PLAYBACK_ERROR,
-            `Native TTS error: ${error}`
+          const speechOptions = {
+            rate: expoRate,
+            pitch: expoPitch,
+            volume: expoVolume,
+            language: fullConfig.language,
+            voice:
+              fullConfig.voice !== 'default' ? fullConfig.voice : undefined,
+            onDone,
+            onError,
+          };
+
+          logger.debug(
+            'NativeTTSService: Calling Speech.speak with options:',
+            speechOptions
           );
-          this.handleError(ttsError);
-          reject(ttsError);
-        };
+          logger.debug('NativeTTSService: Voice being used:', fullConfig.voice);
+          logger.debug(
+            'NativeTTSService: Is voice different from default?',
+            fullConfig.voice !== 'default'
+          );
 
-        // Start speech
-        this.updateState({
-          status: TTSPlaybackStatus.PLAYING,
-          isPlaying: true,
-          isLoading: false,
-          currentText: text,
-          currentTime: 0,
-          totalDuration: 1,
-        });
-
-        const speechOptions = {
-          rate: expoRate,
-          pitch: expoPitch,
-          volume: expoVolume,
-          language: fullConfig.language,
-          voice: fullConfig.voice !== 'default' ? fullConfig.voice : undefined,
-          onDone,
-          onError,
-        };
-
-        logger.debug(
-          'NativeTTSService: Calling Speech.speak with options:',
-          speechOptions
-        );
-        logger.debug('NativeTTSService: Voice being used:', fullConfig.voice);
-        logger.debug(
-          'NativeTTSService: Is voice different from default?',
-          fullConfig.voice !== 'default'
-        );
-
-        Speech.speak(text, speechOptions);
+          Speech.speak(text, speechOptions);
         } catch (error) {
           const ttsError = this.createError(
             TTSErrorType.AUDIO_PLAYBACK_ERROR,
@@ -227,7 +229,7 @@ export class NativeTTSService {
           reject(ttsError);
         }
       };
-      
+
       executeSpeech();
     });
   }

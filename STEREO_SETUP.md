@@ -18,21 +18,25 @@ Before the stereo meditation feature can work with cloud TTS, you need to set up
 ### 2. Supabase Edge Functions Setup
 
 1. **Install Supabase CLI**:
+
    ```bash
    npm install -g supabase
    ```
 
 2. **Login to Supabase**:
+
    ```bash
    supabase login
    ```
 
 3. **Link your project**:
+
    ```bash
    supabase link --project-ref your-project-ref
    ```
 
 4. **Deploy the TTS function**:
+
    ```bash
    supabase functions deploy tts-synthesize
    ```
@@ -81,12 +85,13 @@ EXPO_PUBLIC_SUPABASE_API_KEY=your_supabase_anon_key_here
 **Recommended security measures:**
 
 1. **Rate Limiting** - Limit requests per IP/user
-2. **Authentication** - Require user login for TTS requests  
+2. **Authentication** - Require user login for TTS requests
 3. **Usage Quotas** - Limit requests per user per day
 4. **Monitoring** - Track API usage and costs
 5. **API Key Authentication** - Add custom API key for TTS requests
 
 **Example secure Edge Function:**
+
 ```typescript
 // In supabase/functions/tts-synthesize/index.ts
 export default async function handler(req: Request) {
@@ -95,13 +100,15 @@ export default async function handler(req: Request) {
   if (isRateLimited(clientIP)) {
     return new Response('Rate limited', { status: 429 });
   }
-  
+
   // Authentication check
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return new Response('Unauthorized', { status: 401 });
   }
-  
+
   // Your TTS logic here
 }
 ```
@@ -116,6 +123,7 @@ export default async function handler(req: Request) {
 - **Enterprise-grade security** with proper user identification
 
 **OAuth Flow:**
+
 ```
 User → OAuth Provider → Your App → Supabase Edge Function → Google TTS
   ↓           ↓            ↓              ↓                    ↓
@@ -123,6 +131,7 @@ Login    Short-lived    Store token   Validate token      Generate audio
 ```
 
 **Implementation reminder:**
+
 - Set up OAuth provider (Google, GitHub, etc.)
 - Implement token validation in Edge Function
 - Add client-side OAuth flow
@@ -141,6 +150,7 @@ Login    Short-lived    Store token   Validate token      Generate audio
 ## Audio Generation Flow
 
 The stereo meditation feature:
+
 1. **Generates audio server-side** using Supabase Edge Functions
 2. **Caches audio in Supabase storage** for efficient reuse
 3. **Streams audio to client** for immediate playback
@@ -158,8 +168,9 @@ The stereo meditation feature:
 ✅ **Server-side TTS and audio conversion is already tested and working!**
 
 The stereo meditation system is fully functional with:
+
 - ✅ **Server-side TTS generation** - Tested and working
-- ✅ **Audio conversion with FFmpeg** - Tested and working  
+- ✅ **Audio conversion with FFmpeg** - Tested and working
 - ✅ **Stereo panning** - Tested and working
 - ✅ **Supabase Edge Functions** - Ready for deployment
 
@@ -174,6 +185,7 @@ The stereo meditation uses server-side audio generation with Supabase caching! �
 ## Future Enhancement: Local Audio Storage
 
 **Planned for future versions:**
+
 - **Local device storage** for offline audio playback
 - **Hybrid approach** - Server generation + local caching
 - **Offline-first architecture** - Download and store audio locally

@@ -3,6 +3,7 @@
 ## 📋 Current Status
 
 ### ✅ Completed Features
+
 - **Multi-language Support** (EN, DE, ZH) with proper i18n
 - **Text-to-Speech Integration** (Web, Android, iOS)
 - **Voice Selection** per language with friendly names
@@ -14,6 +15,7 @@
 - **Stereo Meditation Foundation** (UI and data structure ready)
 
 ### 🔧 Recent Fixes
+
 - **Settings Persistence**: Onboarding no longer overrides settings page values
 - **Android Crash Fix**: Proper window.addEventListener check for web platforms
 - **Audio File Loading**: Background initialization with retry logic
@@ -22,18 +24,21 @@
 ## 🎯 Development Strategy
 
 ### Phase 1: Android Focus (Current)
+
 - **Platform**: Android development builds
 - **Development**: Windows PC with `npx expo start --lan`
 - **Testing**: Android device with development build
 - **Package**: `de.hypnohh.hypnotify.dev`
 
 ### Phase 2: iOS Testing (Future)
+
 - **Platform**: iOS via Expo Go initially
 - **Development**: Same Windows PC setup
 - **Testing**: iPhone with Expo Go app
 - **Package**: `de.hypnohh.hypnotify.dev`
 
 ### Phase 3: Production Builds (Future)
+
 - **Android**: EAS Build from Windows
 - **iOS**: Hybrid approach (certificates on Mac, builds from Windows)
 - **Package**: `de.hypnohh.hypnotify` (production)
@@ -41,6 +46,7 @@
 ## 🛠️ Technical Implementation
 
 ### Development Environment
+
 ```bash
 # Current setup
 npx expo start --lan
@@ -52,12 +58,14 @@ npx expo start --lan
 ```
 
 ### Audio System Architecture
+
 - **BackgroundMusicService**: Lazy initialization with background loading
 - **TTSService**: Platform-specific (Web, Android, iOS)
 - **Audio Cleanup**: Comprehensive cleanup on navigation/unmount
 - **Settings Persistence**: Proper merging without overriding
 
 ### Platform-Specific Features
+
 - **Android**: Volume fixed, native TTS voices
 - **Web**: Web Speech API, volume control
 - **iOS**: Native TTS (when implemented)
@@ -65,20 +73,23 @@ npx expo start --lan
 ## 📱 iOS Implementation Plan
 
 ### Step 1: Expo Go Testing
+
 - **Requirements**: iPhone with iOS 11.0+
 - **Setup**: Install Expo Go from App Store
 - **Testing**: Scan QR code, test all features
 - **No Mac required**
 
 ### Step 2: Development Builds
+
 - **Requirements**: Mac for certificate generation
-- **Process**: 
+- **Process**:
   1. Generate certificates on Mac (one-time)
   2. Store in EAS
   3. Build from Windows using stored certificates
 - **Result**: Full native features on iOS
 
 ### Step 3: Production/Ad Hoc Distribution
+
 - **Requirements**: Apple Developer Account ($99/year)
 - **Process**: EAS Build with ad hoc provisioning
 - **Result**: Production-quality builds for testing/demos
@@ -86,6 +97,7 @@ npx expo start --lan
 ## 🔄 Build Strategy
 
 ### Development Builds
+
 ```bash
 # Android (Windows)
 eas build --platform android --profile development
@@ -98,6 +110,7 @@ eas build --platform ios --profile development
 ```
 
 ### Production Builds
+
 ```bash
 # Android (Windows)
 eas build --platform android --profile production
@@ -109,6 +122,7 @@ eas build --platform ios --profile production
 ## 📋 Testing Checklist
 
 ### Android Testing
+
 - [ ] App startup and navigation
 - [ ] TTS functionality with voice selection
 - [ ] Background music setup and playback
@@ -117,6 +131,7 @@ eas build --platform ios --profile production
 - [ ] Offline functionality
 
 ### iOS Testing (Future)
+
 - [ ] Expo Go installation and QR code scanning
 - [ ] TTS functionality
 - [ ] Background music (if supported in Expo Go)
@@ -126,16 +141,19 @@ eas build --platform ios --profile production
 ## 🚨 Known Issues & Solutions
 
 ### Audio File Loading
+
 - **Issue**: Music file takes time to load on first startup
 - **Solution**: Background initialization with retry logic
 - **Status**: Implemented, needs testing
 
 ### Development Build Persistence
+
 - **Issue**: Audio stops working after a while in dev builds
 - **Solution**: Reinitialization logic when cache expires
 - **Status**: Implemented, needs testing
 
 ### Platform Detection
+
 - **Issue**: Scattered platform checks throughout code
 - **Solution**: Centralized platform service (future enhancement)
 - **Status**: Not implemented (avoided to prevent more issues)
@@ -143,18 +161,21 @@ eas build --platform ios --profile production
 ## 📝 Development Guidelines
 
 ### Code Quality
+
 - **Test before commit** - Always verify functionality
 - **Understand the problem** - Don't make changes without context
 - **Preserve working functionality** - Don't break what works
 - **Follow proper engineering practices** - Plan before implementing
 
 ### Git Workflow
+
 - **Commit frequently** with descriptive messages
 - **Test on device** before pushing
 - **Use feature branches** for major changes
 - **Document breaking changes**
 
 ### Platform Considerations
+
 - **Android**: Volume fixed, native TTS
 - **Web**: Web Speech API, volume control
 - **iOS**: Native TTS (when implemented)
@@ -163,6 +184,7 @@ eas build --platform ios --profile production
 ## 🎧 Stereo Meditation Strategy
 
 ### Current Status
+
 - **POC Complete**: Basic stereo meditation working with pre-generated audio files
 - **Challenge**: Need dynamic TTS generation with cloud services
 - **Solution**: Cloud TTS + FFmpeg processing + dynamic stereo assembly
@@ -170,6 +192,7 @@ eas build --platform ios --profile production
 ### Implementation Plan
 
 #### Phase 1: Backend Service Setup
+
 - **Supabase Project**: Set up project and Edge Functions
 - **Google Cloud TTS**: Configure API key and TTS synthesis
 - **Cloud TTS Service**: Create `CloudTTSService.ts` for text-to-audio conversion
@@ -177,6 +200,7 @@ eas build --platform ios --profile production
 - **Caching System**: Store generated audio files for repeated usage
 
 #### Phase 2: Combined Editor/Player Screen
+
 - **New Screen**: `StereoSessionScreen.tsx` (editor + player combined)
 - **Statement Selection**: Reuse existing `EditSession` component
 - **Left/Right Channels**: Edit statements for rational (left) and emotional (right)
@@ -184,12 +208,14 @@ eas build --platform ios --profile production
 - **Statement Display**: Show current playing statements for testing
 
 #### Phase 3: Asynchronous Stereo Playback
+
 - **Independent Channels**: Left and right play independently
 - **Random Timing**: Overlapping playback with random delays (0.5-2 seconds)
 - **Dynamic Generation**: Generate TTS audio on-demand (1-2 second delay, cached)
 - **True Stereo**: Pre-processed audio files with FFmpeg for proper panning
 
 #### Phase 4: Integration with Regular Sessions
+
 - **Session Configuration**: Add stereo session option to regular sessions
 - **Pre-play Option**: Play stereo session before regular session starts
 - **Toggle Control**: "Play Stereo First" option in session settings
@@ -197,6 +223,7 @@ eas build --platform ios --profile production
 ### Technical Architecture
 
 #### Backend Service
+
 ```typescript
 // Supabase Edge Function for TTS
 const ttsResponse = await fetch(
@@ -206,13 +233,14 @@ const ttsResponse = await fetch(
     body: JSON.stringify({
       input: { text },
       voice: { languageCode: language, name: voice },
-      audioConfig: { audioEncoding: 'MP3' }
-    })
+      audioConfig: { audioEncoding: 'MP3' },
+    }),
   }
 );
 ```
 
 #### Stereo Session Data Structure
+
 ```typescript
 interface StereoSession {
   id: string;
@@ -225,12 +253,13 @@ interface StereoSession {
 ```
 
 #### Asynchronous Playback Logic
+
 ```typescript
 class StereoPlayerService {
   async playStereoSession(session: StereoSession) {
     // Start left channel immediately
     this.playChannel(session.leftChannelStatements, 'left');
-    
+
     // Start right channel with random delay
     const randomDelay = Math.random() * 2000 + 500;
     setTimeout(() => {
@@ -243,6 +272,7 @@ class StereoPlayerService {
 ### UI Design
 
 #### StereoSessionScreen Layout
+
 ```
 ┌─────────────────────────────────────┐
 │ Stereo Meditation Session           │
@@ -281,6 +311,7 @@ class StereoPlayerService {
 ```
 
 ### Benefits
+
 - **Full Flexibility**: Any text, any time with cloud TTS
 - **True Stereo**: Proper left/right channel separation via FFmpeg
 - **Natural Randomness**: Asynchronous playback for therapeutic effect
@@ -291,6 +322,7 @@ class StereoPlayerService {
 ## 🎯 Next Steps
 
 ### Immediate (Current Focus)
+
 1. **Set up Supabase project** and configure Edge Functions
 2. **Create CloudTTSService** for Google Cloud TTS integration
 3. **Implement StereoSessionScreen** (combined editor/player)
@@ -298,6 +330,7 @@ class StereoPlayerService {
 5. **Test basic stereo playback** with dynamic TTS generation
 
 ### Short Term
+
 1. **Implement asynchronous playback** with random timing
 2. **Add FFmpeg processing** for stereo panning
 3. **Create caching system** for generated audio files
@@ -305,6 +338,7 @@ class StereoPlayerService {
 5. **Update navigation** (replace experimental menu item)
 
 ### Long Term
+
 1. **User account system** for custom stereo meditations
 2. **Advanced audio processing** (noise reduction, normalization)
 3. **Multiple TTS providers** (AWS Polly, Azure, ElevenLabs)
@@ -312,6 +346,7 @@ class StereoPlayerService {
 5. **Advanced stereo meditation features** (binaural beats, etc.)
 
 ### File Structure Updates
+
 ```
 src/
 ├── screens/
@@ -330,6 +365,7 @@ src/
 ## 📝 Documentation Updates Needed
 
 ### Files to Update
+
 - [ ] **README.md** - Add stereo meditation feature description
 - [ ] **README_PRD.txt** - Update product requirements with stereo meditation
 - [ ] **docs/AUDIO_CAPABILITIES.md** - Document stereo meditation capabilities
@@ -337,6 +373,7 @@ src/
 - [ ] **CONTRIBUTING.md** - Update contribution guidelines for new features
 
 ### Documentation Tasks
+
 - [ ] **Feature Overview** - Document stereo meditation concept and benefits
 - [ ] **Technical Architecture** - Explain Web Speech API + native playback approach
 - [ ] **User Guide** - How to create and use stereo meditations
@@ -345,6 +382,7 @@ src/
 - [ ] **Deployment Guide** - Web and native deployment considerations
 
 ### Reminder Checklist
+
 - [ ] Update main README with stereo meditation section
 - [ ] Document Web Speech API implementation
 - [ ] Add stereo meditation to feature list
@@ -355,11 +393,13 @@ src/
 ## 📚 Resources
 
 ### Documentation
+
 - [Expo Documentation](https://docs.expo.dev/)
 - [React Native Documentation](https://reactnative.dev/docs/getting-started)
 - [EAS Build Documentation](https://docs.expo.dev/build/introduction/)
 
 ### Tools
+
 - **Development**: `npx expo start --lan`
 - **Builds**: `eas build`
 - **Testing**: Android dev build, iOS Expo Go
@@ -367,5 +407,5 @@ src/
 
 ---
 
-*Last updated: $(date)*
-*Version: 1.0.0*
+_Last updated: $(date)_
+_Version: 1.0.0_

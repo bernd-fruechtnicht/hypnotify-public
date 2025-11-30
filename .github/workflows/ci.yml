@@ -35,12 +35,11 @@ jobs:
       - name: Type checking
         run: npm run type-check
 
-      # Temporarily disabled due to formatting issues
-      # - name: Linting
-      #   run: npm run lint
+      - name: Linting
+        run: npm run lint
 
-      # - name: Code formatting check
-      #   run: npm run format:check
+      - name: Code formatting check
+        run: npm run format:check
 
       - name: Build check
         run: npx expo export --platform web --output-dir dist

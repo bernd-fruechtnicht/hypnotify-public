@@ -5,8 +5,9 @@ This document outlines the audio capabilities and volume controls across differe
 ## Volume Control Hierarchy
 
 ### 1. System/Device Volume (External Control)
+
 - **Android**: Hardware volume buttons + system volume slider
-- **iOS**: Hardware volume buttons + Control Center volume slider  
+- **iOS**: Hardware volume buttons + Control Center volume slider
 - **Web**: Browser/system volume controls
 - **Electron**: System volume controls
 - **Control**: User controls via device/browser
@@ -14,49 +15,54 @@ This document outlines the audio capabilities and volume controls across differe
 
 ### 2. App-Level Volume Controls
 
-| Volume Type | Platform | Control Location | Implementation | Notes |
-|-------------|----------|------------------|----------------|-------|
-| **Master Volume** | All | Settings → Audio | ❌ Not Implemented | Placeholder setting only |
-| **TTS Volume** | All | Settings → TTS | ✅ Implemented | Controls speech volume |
-| **Background Music Volume** | All | Settings → Audio | ✅ Implemented | Controls music volume |
+| Volume Type                 | Platform | Control Location | Implementation     | Notes                    |
+| --------------------------- | -------- | ---------------- | ------------------ | ------------------------ |
+| **Master Volume**           | All      | Settings → Audio | ❌ Not Implemented | Placeholder setting only |
+| **TTS Volume**              | All      | Settings → TTS   | ✅ Implemented     | Controls speech volume   |
+| **Background Music Volume** | All      | Settings → Audio | ✅ Implemented     | Controls music volume    |
 
 ## Platform-Specific Audio Capabilities
 
 ### Android (Native)
-| Feature | Capability | Implementation | Notes |
-|---------|------------|----------------|-------|
-| TTS Volume | ✅ Fixed at 100% | `expo-speech` | Volume controlled by system |
-| Background Music | ✅ Variable | `expo-av` | Independent volume control |
-| Audio Mixing | ✅ Supported | Native audio system | TTS + Music can play simultaneously |
-| Background Playback | ✅ Supported | Audio session management | Continues when app is backgrounded |
+
+| Feature             | Capability       | Implementation           | Notes                               |
+| ------------------- | ---------------- | ------------------------ | ----------------------------------- |
+| TTS Volume          | ✅ Fixed at 100% | `expo-speech`            | Volume controlled by system         |
+| Background Music    | ✅ Variable      | `expo-av`                | Independent volume control          |
+| Audio Mixing        | ✅ Supported     | Native audio system      | TTS + Music can play simultaneously |
+| Background Playback | ✅ Supported     | Audio session management | Continues when app is backgrounded  |
 
 ### iOS (Native)
-| Feature | Capability | Implementation | Notes |
-|---------|------------|----------------|-------|
-| TTS Volume | ✅ Variable | `expo-speech` | Can be controlled by app |
-| Background Music | ✅ Variable | `expo-av` | Independent volume control |
-| Audio Mixing | ✅ Supported | AVAudioSession | TTS + Music can play simultaneously |
-| Background Playback | ✅ Supported | Background audio mode | Continues when app is backgrounded |
+
+| Feature             | Capability   | Implementation        | Notes                               |
+| ------------------- | ------------ | --------------------- | ----------------------------------- |
+| TTS Volume          | ✅ Variable  | `expo-speech`         | Can be controlled by app            |
+| Background Music    | ✅ Variable  | `expo-av`             | Independent volume control          |
+| Audio Mixing        | ✅ Supported | AVAudioSession        | TTS + Music can play simultaneously |
+| Background Playback | ✅ Supported | Background audio mode | Continues when app is backgrounded  |
 
 ### Web Browser
-| Feature | Capability | Implementation | Notes |
-|---------|------------|----------------|-------|
-| TTS Volume | ✅ Variable | Web Speech API | Can be controlled by app |
-| Background Music | ✅ Variable | Web Audio API + GainNode | Independent volume control (iOS web browsers fixed) |
-| Audio Mixing | ✅ Supported | Browser audio context | TTS + Music can play simultaneously |
-| Background Playback | ❌ Limited | Browser restrictions | May pause when tab is inactive |
+
+| Feature             | Capability   | Implementation           | Notes                                               |
+| ------------------- | ------------ | ------------------------ | --------------------------------------------------- |
+| TTS Volume          | ✅ Variable  | Web Speech API           | Can be controlled by app                            |
+| Background Music    | ✅ Variable  | Web Audio API + GainNode | Independent volume control (iOS web browsers fixed) |
+| Audio Mixing        | ✅ Supported | Browser audio context    | TTS + Music can play simultaneously                 |
+| Background Playback | ❌ Limited   | Browser restrictions     | May pause when tab is inactive                      |
 
 ### Electron (Desktop)
-| Feature | Capability | Implementation | Notes |
-|---------|------------|----------------|-------|
-| TTS Volume | ✅ Variable | System TTS (SAPI) | Can be controlled by app |
-| Background Music | ✅ Variable | `expo-av` | Independent volume control |
-| Audio Mixing | ✅ Supported | System audio mixer | TTS + Music can play simultaneously |
-| Background Playback | ✅ Supported | Desktop app | Continues when window is minimized |
+
+| Feature             | Capability   | Implementation     | Notes                               |
+| ------------------- | ------------ | ------------------ | ----------------------------------- |
+| TTS Volume          | ✅ Variable  | System TTS (SAPI)  | Can be controlled by app            |
+| Background Music    | ✅ Variable  | `expo-av`          | Independent volume control          |
+| Audio Mixing        | ✅ Supported | System audio mixer | TTS + Music can play simultaneously |
+| Background Playback | ✅ Supported | Desktop app        | Continues when window is minimized  |
 
 ## Volume Control Implementation Details
 
 ### TTS Volume Control
+
 ```typescript
 // How TTS volume is applied
 const ttsVolume = settings.tts.defaultVolume; // 0.0 - 1.0
@@ -67,6 +73,7 @@ const systemVolume = deviceVolume; // Controlled by user
 ```
 
 ### Background Music Volume Control
+
 ```typescript
 // How background music volume is applied
 const musicVolume = settings.audio.backgroundMusic.volume; // 0.0 - 1.0
@@ -86,6 +93,7 @@ if (Platform.OS === 'web' && isIOSWeb) {
 ```
 
 ### Master Volume (Not Implemented)
+
 ```typescript
 // If master volume were implemented:
 const masterVolume = settings.audio.masterVolume; // 0.0 - 1.0
@@ -101,32 +109,38 @@ const systemVolume = deviceVolume; // Controlled by user
 ## Audio Session Management
 
 ### Android
+
 - **Audio Focus**: Automatically managed by `expo-av`
 - **Ducking**: TTS can duck background music
 - **Interruption**: Phone calls pause audio, resume after call
 
-### iOS  
+### iOS
+
 - **Audio Session**: Configured for background playback
 - **Category**: `AVAudioSessionCategoryPlayback`
 - **Options**: `AVAudioSessionCategoryOptionMixWithOthers`
 
 ### Web
+
 - **Audio Context**: Single context for all audio
 - **User Activation**: Requires user interaction to start audio
 - **Autoplay Policy**: Restricted by browser policies
 
 ### Electron
+
 - **System Integration**: Uses system audio services
 - **No Restrictions**: Full desktop audio capabilities
 
 ## Recommendations
 
 ### For Users
+
 1. **Primary Volume Control**: Use device/system volume controls
 2. **Fine-tuning**: Use app-level TTS and background music volume controls
 3. **Audio Mixing**: Adjust TTS and music volumes independently for optimal balance
 
 ### For Developers
+
 1. **Master Volume**: Consider implementing if users request it
 2. **Volume Persistence**: Ensure volume settings persist across app restarts
 3. **Audio Focus**: Handle interruptions gracefully (calls, notifications)
@@ -134,13 +148,13 @@ const systemVolume = deviceVolume; // Controlled by user
 
 ## Current Implementation Status
 
-| Feature | Android | iOS | Web | Electron | Status |
-|---------|---------|-----|-----|----------|--------|
-| TTS Volume Control | Fixed (100%) | Variable | Variable | Variable | ✅ Implemented |
-| Background Music | Variable | Variable | Variable | Variable | ✅ Implemented |
-| Master Volume | N/A | N/A | N/A | N/A | ❌ Not Implemented |
-| Audio Mixing | ✅ | ✅ | ✅ | ✅ | ✅ Working |
-| Background Playback | ✅ | ✅ | ⚠️ Limited | ✅ | ✅ Working |
+| Feature             | Android      | iOS      | Web        | Electron | Status             |
+| ------------------- | ------------ | -------- | ---------- | -------- | ------------------ |
+| TTS Volume Control  | Fixed (100%) | Variable | Variable   | Variable | ✅ Implemented     |
+| Background Music    | Variable     | Variable | Variable   | Variable | ✅ Implemented     |
+| Master Volume       | N/A          | N/A      | N/A        | N/A      | ❌ Not Implemented |
+| Audio Mixing        | ✅           | ✅       | ✅         | ✅       | ✅ Working         |
+| Background Playback | ✅           | ✅       | ⚠️ Limited | ✅       | ✅ Working         |
 
 ## Future Enhancements
 

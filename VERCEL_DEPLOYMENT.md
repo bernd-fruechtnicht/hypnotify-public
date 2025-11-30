@@ -13,12 +13,13 @@ This guide will help you deploy your React Native Web app to Vercel for free.
 You'll need to set these in Vercel's dashboard:
 
 ### Required Variables:
+
 - `EXPO_PUBLIC_SUPABASE_FUNCTION_URL`: Your Supabase Edge Function URL
 - `EXPO_PUBLIC_SUPABASE_API_KEY`: Your Supabase API key
 
 ### How to Get These Values:
 
-1. **Supabase Function URL**: 
+1. **Supabase Function URL**:
    - Go to your Supabase project dashboard
    - Navigate to Edge Functions
    - Copy the URL for your `tts-synthesize` function
@@ -55,16 +56,19 @@ You'll need to set these in Vercel's dashboard:
 ### Option 2: Deploy via Vercel CLI
 
 1. **Install Vercel CLI**:
+
    ```bash
    npm i -g vercel
    ```
 
 2. **Build the Web Version**:
+
    ```bash
    npm run build:web
    ```
 
 3. **Deploy**:
+
    ```bash
    vercel --prod
    ```
@@ -78,11 +82,13 @@ You'll need to set these in Vercel's dashboard:
 ## Post-Deployment
 
 ### Custom Domain (Optional)
+
 - In Vercel dashboard, go to Settings > Domains
 - Add your custom domain
 - Update DNS records as instructed
 
 ### Monitoring
+
 - Check Vercel dashboard for deployment status
 - Monitor function logs for any issues
 - Test the stereo meditation feature
@@ -111,6 +117,7 @@ You'll need to set these in Vercel's dashboard:
    - Check that your domain is allowed in Supabase settings
 
 ### File Size Limits:
+
 - Vercel free tier: 100MB total
 - Your audio files should be optimized
 - Consider using CDN for large assets
@@ -118,12 +125,14 @@ You'll need to set these in Vercel's dashboard:
 ## Cost Considerations
 
 **Vercel Free Tier Includes**:
+
 - 100GB bandwidth per month
 - 100 serverless function executions per day
 - Unlimited static deployments
 - Custom domains
 
 **Potential Costs**:
+
 - Google TTS API usage (pay-per-character)
 - Supabase usage (free tier available)
 - Custom domain (if not using Vercel's free subdomain)

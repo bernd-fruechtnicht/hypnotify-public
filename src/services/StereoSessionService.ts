@@ -270,7 +270,10 @@ export class StereoSessionService {
       );
 
       const validationErrors = validateStereoSession(updatedSession);
-      logger.debug('StereoSessionService: Validation errors:', validationErrors);
+      logger.debug(
+        'StereoSessionService: Validation errors:',
+        validationErrors
+      );
 
       if (validationErrors.length > 0) {
         logger.debug('StereoSessionService: Validation failed, throwing error');
@@ -446,7 +449,9 @@ export class StereoSessionService {
         statistics: {
           ...currentStatistics,
           playCount:
-            playCount !== undefined ? playCount : currentStatistics.playCount + 1,
+            playCount !== undefined
+              ? playCount
+              : currentStatistics.playCount + 1,
           totalTimeSpent:
             timeSpent !== undefined
               ? timeSpent
@@ -789,48 +794,58 @@ export class StereoSessionService {
       }
 
       // Get breathing statements for left channel (rational, no counting)
-      const breathingStatements = allStatements.filter(s => 
-        s.primaryTag === 'breathing' || s.tags.includes('breathing')
+      const breathingStatements = allStatements.filter(
+        s => s.primaryTag === 'breathing' || s.tags.includes('breathing')
       );
       const leftChannelStatements = breathingStatements.filter(s => {
         // Check all languages in multiLanguageContent
         const allTexts = [
           s.text,
-          ...Object.values(s.multiLanguageContent || {}).map(c => c.text)
-        ].join(' ').toLowerCase();
-        
-        return !allTexts.includes('count') &&
-               !allTexts.includes('one') &&
-               !allTexts.includes('two') &&
-               !allTexts.includes('three') &&
-               !allTexts.includes('four') &&
-               !allTexts.includes('five') &&
-               !allTexts.includes('six') &&
-               !allTexts.includes('seven') &&
-               !allTexts.includes('eight') &&
-               !allTexts.includes('nine') &&
-               !allTexts.includes('ten') &&
-               !allTexts.includes('eins') &&
-               !allTexts.includes('zwei') &&
-               !allTexts.includes('drei') &&
-               !allTexts.includes('vier') &&
-               !allTexts.includes('fünf');
+          ...Object.values(s.multiLanguageContent || {}).map(c => c.text),
+        ]
+          .join(' ')
+          .toLowerCase();
+
+        return (
+          !allTexts.includes('count') &&
+          !allTexts.includes('one') &&
+          !allTexts.includes('two') &&
+          !allTexts.includes('three') &&
+          !allTexts.includes('four') &&
+          !allTexts.includes('five') &&
+          !allTexts.includes('six') &&
+          !allTexts.includes('seven') &&
+          !allTexts.includes('eight') &&
+          !allTexts.includes('nine') &&
+          !allTexts.includes('ten') &&
+          !allTexts.includes('eins') &&
+          !allTexts.includes('zwei') &&
+          !allTexts.includes('drei') &&
+          !allTexts.includes('vier') &&
+          !allTexts.includes('fünf')
+        );
       });
-      const leftChannelIds = (leftChannelStatements.length >= 10 
-        ? leftChannelStatements 
-        : breathingStatements).slice(0, 10).map(s => s.id);
+      const leftChannelIds = (
+        leftChannelStatements.length >= 10
+          ? leftChannelStatements
+          : breathingStatements
+      )
+        .slice(0, 10)
+        .map(s => s.id);
 
       // Get mindfulness statements for right channel (emotional/awareness)
-      const mindfulnessStatements = allStatements.filter(s => 
-        s.primaryTag === 'mindfulness' || s.tags.includes('mindfulness')
+      const mindfulnessStatements = allStatements.filter(
+        s => s.primaryTag === 'mindfulness' || s.tags.includes('mindfulness')
       );
       const rightChannelStatements = mindfulnessStatements.filter(s => {
         // Check all languages in multiLanguageContent
         const allTexts = [
           s.text,
-          ...Object.values(s.multiLanguageContent || {}).map(c => c.text)
-        ].join(' ').toLowerCase();
-        
+          ...Object.values(s.multiLanguageContent || {}).map(c => c.text),
+        ]
+          .join(' ')
+          .toLowerCase();
+
         return (
           allTexts.includes('feel') ||
           allTexts.includes('ich fühle') ||
@@ -845,9 +860,13 @@ export class StereoSessionService {
           allTexts.includes('beobachte')
         );
       });
-      const rightChannelIds = (rightChannelStatements.length >= 10 
-        ? rightChannelStatements 
-        : mindfulnessStatements).slice(0, 10).map(s => s.id);
+      const rightChannelIds = (
+        rightChannelStatements.length >= 10
+          ? rightChannelStatements
+          : mindfulnessStatements
+      )
+        .slice(0, 10)
+        .map(s => s.id);
 
       logger.debug(
         'StereoSessionService: Using left channel IDs:',
@@ -916,7 +935,9 @@ export class StereoSessionService {
         );
       }
 
-      logger.debug('StereoSessionService: Default session created successfully');
+      logger.debug(
+        'StereoSessionService: Default session created successfully'
+      );
     } catch (error) {
       logger.error(
         'StereoSessionService: Failed to create default sessions:',

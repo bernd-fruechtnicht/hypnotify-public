@@ -10,7 +10,12 @@ import {
   getStatementsByCategory,
 } from '../data/initialStatements';
 import { DEFAULT_APP_SETTINGS } from '../types/AppSettings';
-import { MeditationSession, StatementCategory, StereoSession, StereoSessionCategory } from '../types';
+import {
+  MeditationSession,
+  StatementCategory,
+  StereoSession,
+  StereoSessionCategory,
+} from '../types';
 
 export class DataSeedingService {
   private static instance: DataSeedingService;
@@ -131,7 +136,9 @@ export class DataSeedingService {
       const defaultStereoSessions = this.createDefaultStereoSessions();
       await storageService.saveStereoSessions(defaultStereoSessions);
 
-      logger.debug(`Seeded ${defaultStereoSessions.length} default stereo sessions`);
+      logger.debug(
+        `Seeded ${defaultStereoSessions.length} default stereo sessions`
+      );
     } catch (error) {
       logger.error('Failed to seed stereo sessions:', error);
       throw error;
@@ -398,54 +405,65 @@ export class DataSeedingService {
 
     // Get breathing statements for left channel (rational/instructional)
     const getBreathingStatementIds = (): string[] => {
-      const breathingStatements = getStatementsByCategory(StatementCategory.BREATHING);
-      
+      const breathingStatements = getStatementsByCategory(
+        StatementCategory.BREATHING
+      );
+
       // Filter out counting statements and focus on breathing techniques
       // Check all languages in multiLanguageContent
       const filteredStatements = breathingStatements.filter(stmt => {
         const allTexts = [
           stmt.text,
-          ...Object.values(stmt.multiLanguageContent || {}).map(c => c.text)
-        ].join(' ').toLowerCase();
-        
-        return !allTexts.includes('count') &&
-               !allTexts.includes('one') &&
-               !allTexts.includes('two') &&
-               !allTexts.includes('three') &&
-               !allTexts.includes('four') &&
-               !allTexts.includes('five') &&
-               !allTexts.includes('six') &&
-               !allTexts.includes('seven') &&
-               !allTexts.includes('eight') &&
-               !allTexts.includes('nine') &&
-               !allTexts.includes('ten') &&
-               !allTexts.includes('eins') &&
-               !allTexts.includes('zwei') &&
-               !allTexts.includes('drei') &&
-               !allTexts.includes('vier') &&
-               !allTexts.includes('fünf');
+          ...Object.values(stmt.multiLanguageContent || {}).map(c => c.text),
+        ]
+          .join(' ')
+          .toLowerCase();
+
+        return (
+          !allTexts.includes('count') &&
+          !allTexts.includes('one') &&
+          !allTexts.includes('two') &&
+          !allTexts.includes('three') &&
+          !allTexts.includes('four') &&
+          !allTexts.includes('five') &&
+          !allTexts.includes('six') &&
+          !allTexts.includes('seven') &&
+          !allTexts.includes('eight') &&
+          !allTexts.includes('nine') &&
+          !allTexts.includes('ten') &&
+          !allTexts.includes('eins') &&
+          !allTexts.includes('zwei') &&
+          !allTexts.includes('drei') &&
+          !allTexts.includes('vier') &&
+          !allTexts.includes('fünf')
+        );
       });
-      
+
       // If we don't have enough filtered statements, use all breathing statements
-      const finalStatements = filteredStatements.length >= 10 
-        ? filteredStatements 
-        : breathingStatements;
-        
+      const finalStatements =
+        filteredStatements.length >= 10
+          ? filteredStatements
+          : breathingStatements;
+
       return finalStatements.slice(0, 10).map(stmt => stmt.id);
     };
 
     // Get mindfulness statements for right channel (emotional/awareness)
     const getMindfulnessStatementIds = (): string[] => {
-      const mindfulnessStatements = getStatementsByCategory(StatementCategory.MINDFULNESS);
-      
+      const mindfulnessStatements = getStatementsByCategory(
+        StatementCategory.MINDFULNESS
+      );
+
       // Focus on emotional and awareness statements (English and German)
       // Check all languages in multiLanguageContent
       const filteredStatements = mindfulnessStatements.filter(stmt => {
         const allTexts = [
           stmt.text,
-          ...Object.values(stmt.multiLanguageContent || {}).map(c => c.text)
-        ].join(' ').toLowerCase();
-        
+          ...Object.values(stmt.multiLanguageContent || {}).map(c => c.text),
+        ]
+          .join(' ')
+          .toLowerCase();
+
         return (
           // English keywords
           allTexts.includes('feel') ||
@@ -470,12 +488,13 @@ export class DataSeedingService {
           allTexts.includes('beobachten')
         );
       });
-      
+
       // If we don't have enough filtered statements, use all mindfulness statements
-      const finalStatements = filteredStatements.length >= 10 
-        ? filteredStatements 
-        : mindfulnessStatements;
-        
+      const finalStatements =
+        filteredStatements.length >= 10
+          ? filteredStatements
+          : mindfulnessStatements;
+
       return finalStatements.slice(0, 10).map(stmt => stmt.id);
     };
 
@@ -483,15 +502,18 @@ export class DataSeedingService {
       {
         id: generateId(),
         name: 'Breathing & Mindfulness Balance',
-        description: 'A stereo meditation combining breathing techniques with mindful awareness.',
+        description:
+          'A stereo meditation combining breathing techniques with mindful awareness.',
         multiLanguageContent: {
           en: {
             name: 'Breathing & Mindfulness Balance',
-            description: 'A stereo meditation combining breathing techniques with mindful awareness.',
+            description:
+              'A stereo meditation combining breathing techniques with mindful awareness.',
           },
           de: {
             name: 'Atem- und Achtsamkeits-Balance',
-            description: 'Eine Stereo-Meditation, die Atemtechniken mit achtsamer Bewusstheit kombiniert.',
+            description:
+              'Eine Stereo-Meditation, die Atemtechniken mit achtsamer Bewusstheit kombiniert.',
           },
           zh: {
             name: '呼吸与正念平衡',
@@ -512,15 +534,18 @@ export class DataSeedingService {
       {
         id: generateId(),
         name: 'Relaxation & Emotional Awareness',
-        description: 'A stereo meditation combining relaxation techniques with emotional awareness.',
+        description:
+          'A stereo meditation combining relaxation techniques with emotional awareness.',
         multiLanguageContent: {
           en: {
             name: 'Relaxation & Emotional Awareness',
-            description: 'A stereo meditation combining relaxation techniques with emotional awareness.',
+            description:
+              'A stereo meditation combining relaxation techniques with emotional awareness.',
           },
           de: {
             name: 'Entspannung & Emotionale Bewusstheit',
-            description: 'Eine Stereo-Meditation, die Entspannungstechniken mit emotionaler Bewusstheit kombiniert.',
+            description:
+              'Eine Stereo-Meditation, die Entspannungstechniken mit emotionaler Bewusstheit kombiniert.',
           },
           zh: {
             name: '放松与情感觉知',

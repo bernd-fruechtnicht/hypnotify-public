@@ -95,7 +95,9 @@ export class WebTTSService {
           });
         }
       } else {
-        logger.debug('WebTTSService: Not web platform, skipping initialization');
+        logger.debug(
+          'WebTTSService: Not web platform, skipping initialization'
+        );
         return;
       }
 
@@ -419,7 +421,9 @@ export class WebTTSService {
           logger.debug('WebTTSService: Starting speech synthesis');
           try {
             this.speechSynthesis.speak(utterance);
-            logger.debug('WebTTSService: Speech synthesis started successfully');
+            logger.debug(
+              'WebTTSService: Speech synthesis started successfully'
+            );
             // Don't update state here - let onstart event handle it
           } catch (error) {
             logger.error(

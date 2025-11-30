@@ -192,7 +192,8 @@ To use cloud-based TTS features, you need to configure the following environment
 - `EXPO_PUBLIC_SUPABASE_FUNCTION_URL`: URL to your TTS synthesis service endpoint
 - `EXPO_PUBLIC_SUPABASE_API_KEY`: API key for authentication
 
-**Note**: 
+**Note**:
+
 - The backend services are **not included** in this repository and are proprietary
 - You can implement your own backend services following the same interface
 - For local development, the app will fall back to device-native TTS capabilities
@@ -225,6 +226,7 @@ To use cloud-based TTS features, you need to configure the following environment
 ## 📞 Support
 
 This is an open source project. For support, please use:
+
 - 🐛 [GitHub Issues](https://github.com/bernd-fruechtnicht/hypnotify-public/issues) - Report bugs or request features
 - 💬 [GitHub Discussions](https://github.com/bernd-fruechtnicht/hypnotify-public/discussions) - Ask questions or share ideas
 

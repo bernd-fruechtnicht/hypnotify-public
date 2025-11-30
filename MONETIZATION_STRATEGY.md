@@ -17,12 +17,14 @@ This document outlines the monetization strategy for Hypnotify. The core applica
 **Strategy**: Add premium features that require in-app purchases or subscriptions.
 
 **Architecture Considerations**:
+
 - Use feature flags to enable/disable premium features
 - Separate premium feature code in dedicated modules
 - Consider using separate branches for premium features if needed
 - Implement subscription management (e.g., RevenueCat, Stripe)
 
 **Potential Premium Features**:
+
 - Advanced meditation session customization
 - AI-generated meditation content
 - Extended session duration
@@ -34,16 +36,19 @@ This document outlines the monetization strategy for Hypnotify. The core applica
 **Strategy**: Proprietary backend services that complement the open-source app.
 
 **Current Implementation**:
+
 - Supabase Edge Functions for TTS synthesis (proprietary)
 - Future: Additional cloud services for premium features
 
 **Architecture**:
+
 - Backend services remain in private repositories
 - API endpoints require authentication/authorization
 - Rate limiting for free tier vs. premium tier
 - Usage analytics and billing integration
 
 **Potential Services**:
+
 - Cloud TTS with advanced voice options
 - Session synchronization across devices
 - AI-powered content generation
@@ -53,6 +58,7 @@ This document outlines the monetization strategy for Hypnotify. The core applica
 ### 3. Consulting & Support
 
 **Strategy**: Offer consulting services for:
+
 - Custom meditation app development
 - TTS integration and optimization
 - React Native / Expo development
@@ -61,6 +67,7 @@ This document outlines the monetization strategy for Hypnotify. The core applica
 ### 4. Enterprise Licensing
 
 **Strategy**: Offer enterprise licenses for:
+
 - White-label solutions
 - Custom branding
 - Dedicated support
@@ -122,5 +129,3 @@ interface FeatureFlags {
 - Premium features can be developed incrementally
 - Backend services provide natural monetization boundary
 - MIT License allows others to fork, but proprietary services remain exclusive
-
-
