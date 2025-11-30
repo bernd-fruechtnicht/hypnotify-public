@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
 import { VoiceSelector } from '../components/VoiceSelector';
 import { StandardHeader } from '../components/StandardHeader';
+import { LegalScreen } from './LegalScreen';
 import {
   storageService,
   ttsService,
@@ -37,6 +38,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_APP_SETTINGS);
   const [isLoading, setIsLoading] = useState(true);
   const [showVoiceSelector, setShowVoiceSelector] = useState(false);
+  const [showLegalScreen, setShowLegalScreen] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<any[]>([]);
   const [_isBackgroundMusicAvailable, setIsBackgroundMusicAvailable] =
     useState(false);
@@ -279,6 +281,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       ]);
     }
   };
+
+  if (showLegalScreen) {
+    return <LegalScreen onBack={() => setShowLegalScreen(false)} />;
+  }
 
   if (isLoading) {
     return (
@@ -708,6 +714,15 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           >
             <Text style={[styles.actionButtonText, styles.dangerButtonText]}>
               {t('settings.clearData')}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => setShowLegalScreen(true)}
+          >
+            <Text style={styles.actionButtonText}>
+              {t('settings.legal', 'Legal Information')}
             </Text>
           </TouchableOpacity>
         </View>

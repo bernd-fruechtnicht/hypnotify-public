@@ -133,7 +133,8 @@
     "weekly": "Wöchentlich",
     "high": "Hoch",
     "medium": "Mittel",
-    "low": "Niedrig"
+    "low": "Niedrig",
+    "legal": "Rechtliche Informationen"
   },
   "categories": {
     "breathing": "Atmung",
@@ -222,7 +223,8 @@
     "title": "Ersteinrichtung",
     "welcome": {
       "title": "Willkommen bei Hypnotify",
-      "description": "Deine personalisierte Meditations- und Hypnose-App.\n\nPasse Meditationen deinen persönlichen Bedürfnissen und Vorlieben an"
+      "description": "Deine personalisierte Meditations- und Hypnose-App.\n\nPasse Meditationen deinen persönlichen Bedürfnissen und Vorlieben an",
+      "safetyNotice": "Nutze die App nur in einer sicheren Umgebung, in der du dich entspannen kannst, ohne abgelenkt zu sein."
     },
     "features": {
       "title": "Hauptfunktionen",
@@ -338,5 +340,26 @@
     "sessionRewound": "Sitzung abgeschlossen und bereit zum Neustart",
     "defaultSessionName": "Bilaterale Entspannung",
     "defaultSessionDescription": "Eine grundlegende bilaterale Stimulationssitzung zur Entspannung"
+  },
+  "legal": {
+    "title": "Rechtliche Informationen",
+    "imprint": "Impressum",
+    "operator": "Betreiber",
+    "address": "Adresse",
+    "email": "E-Mail",
+    "disclaimer": "Haftungsausschluss",
+    "disclaimerText": "Die Nutzung dieser App erfolgt auf eigene Gefahr. Die App wird \"wie besehen\" ohne jegliche Garantien oder Gewährleistungen bereitgestellt.",
+    "noMedicalAdvice": "Diese App bietet keine medizinische Beratung, Diagnose oder Behandlung. Die Meditations- und Hypnoseinhalte dienen ausschließlich der Entspannung und persönlichen Entwicklung.",
+    "noDriving": "⚠️ WICHTIG: Verwenden Sie diese App nicht beim Autofahren, beim Bedienen von Maschinen oder bei Tätigkeiten, die Ihre volle Aufmerksamkeit erfordern. Nutzen Sie die App nur in einer sicheren Umgebung, in der Sie sich entspannen können, ohne abgelenkt zu sein.",
+    "noLiability": "Der Betreiber übernimmt keine Haftung für Schäden, Verletzungen oder Verluste, die aus der Nutzung oder Unfähigkeit zur Nutzung dieser App resultieren.",
+    "contentAccuracy": "Obwohl wir uns bemühen, genaue Informationen bereitzustellen, geben wir keine Zusicherungen oder Garantien über die Genauigkeit, Vollständigkeit oder Eignung der Inhalte für einen bestimmten Zweck ab.",
+    "dataProtection": "Datenschutz",
+    "dataProtectionText": "Diese App verarbeitet Daten lokal auf Ihrem Gerät. Wir sammeln, speichern oder übertragen keine personenbezogenen Daten an externe Server, außer für den Text-zu-Sprache-Synthesedienst, der Ihre Meditationsaussagen verarbeitet, um Audio zu generieren.",
+    "ttsService": "Der TTS-Dienst kann Ihre Aussagen vorübergehend verarbeiten, um Audio zu generieren. Keine personenbezogenen Daten werden dauerhaft vom TTS-Dienst gespeichert.",
+    "version": "Versionsinformationen",
+    "appVersion": "App-Version",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "contactSubject": "Kontakt Hypnotify",
+    "contactBody": "Hallo,\n\n"
   }
 }

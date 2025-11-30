@@ -195,7 +195,8 @@
     "weekly": "Weekly",
     "high": "High",
     "medium": "Medium",
-    "low": "Low"
+    "low": "Low",
+    "legal": "Legal Information"
   },
   "categories": {
     "breathing": "Breathing",
@@ -284,7 +285,8 @@
     "title": "Onboarding",
     "welcome": {
       "title": "Welcome to Hypnotify",
-      "description": "Your personalized meditation and hypnosis app.\n\nCustomize meditations to your personal needs and preferences"
+      "description": "Your personalized meditation and hypnosis app.\n\nCustomize meditations to your personal needs and preferences",
+      "safetyNotice": "Use the app only in a safe environment where you can relax without distractions."
     },
     "features": {
       "title": "Key Features",
@@ -347,5 +349,26 @@
     "initializationFailed": "Failed to initialize stereo session screen",
     "saveFailed": "Failed to save statements",
     "playbackFailed": "Failed to start playback"
+  },
+  "legal": {
+    "title": "Legal Information",
+    "imprint": "Impressum",
+    "operator": "Operator",
+    "address": "Address",
+    "email": "E-Mail",
+    "disclaimer": "Disclaimer",
+    "disclaimerText": "The use of this app is at your own risk. The app is provided \"as is\" without any warranties or guarantees.",
+    "noMedicalAdvice": "This app does not provide medical advice, diagnosis, or treatment. The meditation and hypnosis content is for relaxation and personal development purposes only.",
+    "noDriving": "⚠️ IMPORTANT: Do not use this app while driving, operating machinery, or performing any activity that requires your full attention. Use only in a safe environment where you can relax without distractions.",
+    "noLiability": "The operator assumes no liability for any damages, injuries, or losses resulting from the use or inability to use this app.",
+    "contentAccuracy": "While we strive to provide accurate information, we make no representations or warranties about the accuracy, completeness, or suitability of the content for any particular purpose.",
+    "dataProtection": "Data Protection",
+    "dataProtectionText": "This app processes data locally on your device. We do not collect, store, or transmit personal data to external servers, except for the Text-to-Speech synthesis service which processes your meditation statements to generate audio.",
+    "ttsService": "The TTS service may process your statements temporarily to generate audio. No personal data is stored permanently by the TTS service.",
+    "version": "Version Information",
+    "appVersion": "App Version",
+    "lastUpdated": "Last Updated",
+    "contactSubject": "Contact Hypnotify",
+    "contactBody": "Hello,\n\n"
   }
 }

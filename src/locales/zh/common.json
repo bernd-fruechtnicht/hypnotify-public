@@ -133,7 +133,8 @@
     "weekly": "每周",
     "high": "高",
     "medium": "中",
-    "low": "低"
+    "low": "低",
+    "legal": "法律信息"
   },
   "categories": {
     "breathing": "呼吸",
@@ -222,7 +223,8 @@
     "title": "初始设置",
     "welcome": {
       "title": "欢迎使用 Hypnotify",
-      "description": "你的个性化冥想和催眠应用。\n\n根据你的个人需求和偏好定制冥想"
+      "description": "你的个性化冥想和催眠应用。\n\n根据你的个人需求和偏好定制冥想",
+      "safetyNotice": "请在安全的环境中使用此应用，确保你可以在不受干扰的情况下放松。"
     },
     "features": {
       "title": "主要功能",
@@ -338,5 +340,26 @@
     "sessionRewound": "会话完成，准备重新开始",
     "defaultSessionName": "双边放松",
     "defaultSessionDescription": "一个基本的双边刺激放松会话"
+  },
+  "legal": {
+    "title": "法律信息",
+    "imprint": "法律声明",
+    "operator": "运营商",
+    "address": "地址",
+    "email": "电子邮件",
+    "disclaimer": "免责声明",
+    "disclaimerText": "使用此应用程序的风险由您自行承担。应用程序按\"原样\"提供，不提供任何保证或担保。",
+    "noMedicalAdvice": "此应用程序不提供医疗建议、诊断或治疗。冥想和催眠内容仅用于放松和个人发展目的。",
+    "noDriving": "⚠️ 重要提示：请勿在驾驶、操作机器或进行任何需要您全神贯注的活动时使用此应用程序。仅在安全环境中使用，您可以在不受干扰的情况下放松。",
+    "noLiability": "运营商不对因使用或无法使用此应用程序而造成的任何损害、伤害或损失承担责任。",
+    "contentAccuracy": "虽然我们努力提供准确的信息，但我们不对内容的准确性、完整性或对任何特定目的的适用性做出任何陈述或保证。",
+    "dataProtection": "数据保护",
+    "dataProtectionText": "此应用程序在您的设备上本地处理数据。我们不会收集、存储或向外部服务器传输个人数据，但用于处理您的冥想语句以生成音频的文本转语音合成服务除外。",
+    "ttsService": "TTS服务可能会临时处理您的语句以生成音频。TTS服务不会永久存储任何个人数据。",
+    "version": "版本信息",
+    "appVersion": "应用程序版本",
+    "lastUpdated": "最后更新",
+    "contactSubject": "联系 Hypnotify",
+    "contactBody": "你好，\n\n"
   }
 }

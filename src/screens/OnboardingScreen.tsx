@@ -221,6 +221,15 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           {/* Description */}
           <Text style={styles.description}>{currentStepData.description}</Text>
 
+          {/* Safety notice on welcome page */}
+          {currentStepData.id === 'welcome' && (
+            <View style={styles.safetyNotice}>
+              <Text style={styles.safetyNoticeText}>
+                {t('onboarding.welcome.safetyNotice')}
+              </Text>
+            </View>
+          )}
+
           {/* Step-specific content */}
           {currentStepData.id === 'features' && (
             <View style={styles.featuresList}>
@@ -514,5 +523,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
     fontWeight: '600',
+  },
+  safetyNotice: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#E8F5E9',
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4CAF50',
+    width: '100%',
+  },
+  safetyNoticeText: {
+    fontSize: 14,
+    color: '#2E7D32',
+    lineHeight: 20,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
