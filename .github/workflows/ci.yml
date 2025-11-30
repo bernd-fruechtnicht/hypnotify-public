@@ -14,6 +14,14 @@ permissions:
 # Note: Quality Checks wurden in quality-checks.yml ausgelagert
 # Dieser Workflow ist für zukünftige CI/CD Tasks reserviert
 
+jobs:
+  placeholder:
+    name: Placeholder (reserved for future CI/CD tasks)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow placeholder
+        run: echo "This workflow is reserved for future CI/CD tasks. Quality checks are handled by quality-checks.yml"
+
 # Build jobs - uncomment when EXPO_TOKEN secret is added
 # build-android:
 #   name: Build Android
