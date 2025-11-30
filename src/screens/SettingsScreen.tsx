@@ -197,32 +197,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     saveSettings(newSettings);
   };
 
-  const handleNotificationChange = (
-    notifications: Partial<AppSettings['notifications']>
-  ) => {
-    const newSettings = {
-      ...settings,
-      notifications: { ...settings.notifications, ...notifications },
-    };
-    saveSettings(newSettings);
-  };
-
-  const handlePrivacyChange = (privacy: Partial<AppSettings['privacy']>) => {
-    const newSettings = {
-      ...settings,
-      privacy: { ...settings.privacy, ...privacy },
-    };
-    saveSettings(newSettings);
-  };
-
-  const handleDataChange = (data: Partial<AppSettings['data']>) => {
-    const newSettings = {
-      ...settings,
-      data: { ...settings.data, ...data },
-    };
-    saveSettings(newSettings);
-  };
-
   const handleResetSettings = () => {
     Alert.alert(t('settings.resetSettings'), t('settings.resetConfirm'), [
       {
@@ -704,91 +678,6 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
               </View>
             </>
           )}
-        </View>
-
-        {/* Notifications */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('settings.notifications')}</Text>
-
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>
-              {t('settings.notificationsEnabled')}
-            </Text>
-            <Switch
-              value={settings.notifications.enabled}
-              onValueChange={enabled => handleNotificationChange({ enabled })}
-            />
-          </View>
-
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>
-              {t('settings.dailyReminders')}
-            </Text>
-            <Switch
-              value={settings.notifications.dailyReminders}
-              onValueChange={dailyReminders =>
-                handleNotificationChange({ dailyReminders })
-              }
-            />
-          </View>
-        </View>
-
-        {/* Privacy */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('settings.privacy')}</Text>
-
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>{t('settings.analytics')}</Text>
-            <Switch
-              value={settings.privacy.collectAnalytics}
-              onValueChange={collectAnalytics =>
-                handlePrivacyChange({ collectAnalytics })
-              }
-            />
-          </View>
-
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>
-              {t('settings.crashReporting')}
-            </Text>
-            <Switch
-              value={settings.privacy.collectCrashReports}
-              onValueChange={collectCrashReports =>
-                handlePrivacyChange({ collectCrashReports })
-              }
-            />
-          </View>
-        </View>
-
-        {/* Data Settings */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('settings.storage')}</Text>
-
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>{t('settings.autoBackup')}</Text>
-            <Switch
-              value={settings.data.autoBackup}
-              onValueChange={autoBackup => handleDataChange({ autoBackup })}
-            />
-          </View>
-
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>
-              {t('settings.backupFrequency')}
-            </Text>
-            <Text style={styles.settingValue}>
-              {t(`settings.${settings.data.backupFrequency}`)}
-            </Text>
-          </View>
-
-          <View style={styles.settingRow}>
-            <Text style={styles.settingLabel}>
-              {t('settings.dataRetention')}
-            </Text>
-            <Text style={styles.settingValue}>
-              {settings.data.dataRetentionDays} {t('settings.days')}
-            </Text>
-          </View>
         </View>
 
         {/* Actions */}
