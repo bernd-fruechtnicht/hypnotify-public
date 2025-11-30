@@ -5,7 +5,7 @@ on:
     workflows: ['Quality Checks']
     types:
       - completed
-    branches: [main, 'feature/**']
+    branches: [main]
   workflow_dispatch:
     inputs:
       profile:
@@ -24,26 +24,25 @@ jobs:
   # Quality Checks bei workflow_dispatch (manueller Trigger, nur von main)
   # Bei workflow_run werden Quality Checks bereits vom Quality Checks Workflow ausgeführt
   quality-checks:
+    name: Quality Checks
     uses: ./.github/workflows/reusable-quality-checks.yml
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
 
   build-ios:
-    name: Build iOS
+    name: Build iOS App
     # Warte auf Quality Checks (bei workflow_dispatch) oder auf workflow_run
     # Build nur von main Branch (sowohl bei workflow_run als auch workflow_dispatch)
-    # Bei workflow_run: Nur bei [deploy ios] in Commit-Message
+    # Bei workflow_run: Nur bei [deploy ios] in Commit-Message (nur auf main)
     needs:
       - quality-checks
     uses: ./.github/workflows/reusable-eas-build.yml
     if: |
-      # Bei workflow_run: Quality Checks bereits gelaufen (workflow_run.conclusion == 'success')
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.head_commit &&
        github.event.workflow_run.head_branch == 'main' &&
        (contains(github.event.workflow_run.head_commit.message, '[deploy ios]') ||
         contains(github.event.workflow_run.head_commit.message, '[deploy]'))) ||
-      # Bei workflow_dispatch: Warte auf Quality Checks (nur von main)
       (github.event_name == 'workflow_dispatch' &&
        github.ref == 'refs/heads/main' &&
        needs.quality-checks.result == 'success')
