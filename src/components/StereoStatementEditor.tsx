@@ -15,6 +15,7 @@ import {
   BackHandler,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { useLanguage } from '../contexts/LanguageContext';
 import { StandardHeader } from './StandardHeader';
 import { StatementCard } from './StatementCard';
@@ -67,7 +68,7 @@ export const StereoStatementEditor: React.FC<StereoStatementEditorProps> = ({
       const statements = await storageService.loadStatements();
       setAllStatements(statements);
     } catch (error) {
-      console.error('Failed to load statements:', error);
+      logger.error('Failed to load statements:', error);
       Alert.alert(t('common.error'), 'Failed to load statements');
     } finally {
       setIsLoading(false);

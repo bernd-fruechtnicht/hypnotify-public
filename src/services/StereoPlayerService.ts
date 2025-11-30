@@ -18,6 +18,7 @@ import {
 import { MeditationStatement } from '../types/MeditationStatement';
 import { cloudTTSService, CloudTTSOptions } from './CloudTTSService';
 import { stereoSessionService } from './StereoSessionService';
+import { logger } from '../utils/logger';
 // Define ApiError locally
 interface ApiError {
   code: string;
@@ -119,7 +120,7 @@ export class StereoPlayerService {
     }
 
     try {
-      console.log('StereoPlayerService: Initializing...');
+      logger.debug('StereoPlayerService: Initializing...');
 
       if (config) {
         this.config = { ...this.config, ...config };
@@ -137,7 +138,7 @@ export class StereoPlayerService {
       this.isInitialized = true;
       this.updateState({ isInitialized: true });
 
-      console.log('StereoPlayerService: Initialized successfully');
+      logger.debug('StereoPlayerService: Initialized successfully');
     } catch (error) {
       const apiError = this.createApiError(
         'INITIALIZATION_FAILED',
@@ -165,7 +166,7 @@ export class StereoPlayerService {
         await this.stopPlayback();
       } catch (error) {
         // Ignore errors when stopping previous playback - we'll start fresh anyway
-        console.log('StereoPlayerService: Error stopping previous playback, continuing:', error);
+        logger.debug('StereoPlayerService: Error stopping previous playback, continuing:', error);
       }
     }
 
@@ -187,7 +188,7 @@ export class StereoPlayerService {
     });
 
     try {
-      console.log(
+      logger.debug(
         'StereoPlayerService: Starting session playback:',
         session.name
       );
@@ -222,7 +223,7 @@ export class StereoPlayerService {
         },
       });
 
-      console.log('StereoPlayerService: Session playback started successfully');
+      logger.debug('StereoPlayerService: Session playback started successfully');
     } catch (error) {
       this.updateState({
         isGenerating: false,
@@ -247,7 +248,7 @@ export class StereoPlayerService {
    */
   public updateLanguage(currentLanguage: string): void {
     this.currentLanguage = currentLanguage;
-    console.log('StereoPlayerService: Language updated to:', currentLanguage);
+    logger.debug('StereoPlayerService: Language updated to:', currentLanguage);
   }
 
   /**
@@ -259,7 +260,7 @@ export class StereoPlayerService {
     }
 
     try {
-      console.log('StereoPlayerService: Pausing playback');
+      logger.debug('StereoPlayerService: Pausing playback');
 
       // Clear all active timeouts to prevent new statements from starting
       this.activeTimeouts.forEach(timeoutId => {
@@ -279,7 +280,7 @@ export class StereoPlayerService {
         },
       });
 
-      console.log('StereoPlayerService: Playback paused');
+      logger.debug('StereoPlayerService: Playback paused');
     } catch (error) {
       const apiError = this.createApiError(
         'PAUSE_FAILED',
@@ -300,7 +301,7 @@ export class StereoPlayerService {
     }
 
     try {
-      console.log('StereoPlayerService: Resuming playback');
+      logger.debug('StereoPlayerService: Resuming playback');
 
       // Resume all paused sounds
       await this.resumeAllSounds();
@@ -317,7 +318,7 @@ export class StereoPlayerService {
       // Restart statement scheduling for both channels
       await this.restartStatementScheduling();
 
-      console.log('StereoPlayerService: Playback resumed');
+      logger.debug('StereoPlayerService: Playback resumed');
     } catch (error) {
       const apiError = this.createApiError(
         'RESUME_FAILED',
@@ -338,7 +339,7 @@ export class StereoPlayerService {
     }
 
     try {
-      console.log('StereoPlayerService: Stopping playback');
+      logger.debug('StereoPlayerService: Stopping playback');
 
       this.isStopping = true;
 
@@ -378,14 +379,14 @@ export class StereoPlayerService {
       this.rightChannelIndex = 0;
       this.isStopping = false;
 
-      console.log('StereoPlayerService: Playback stopped');
+      logger.debug('StereoPlayerService: Playback stopped');
       
       // Unload all sounds after resetting state (non-blocking)
       // Don't throw errors here - we've already stopped playback
       try {
         await this.unloadAllSounds();
       } catch (error) {
-        console.log('StereoPlayerService: Error unloading sounds after stop (non-critical):', error);
+        logger.debug('StereoPlayerService: Error unloading sounds after stop (non-critical):', error);
       }
     } catch (error) {
       // Reset state even if stopping failed
@@ -466,7 +467,7 @@ export class StereoPlayerService {
     this.stateChangeListeners = [];
     this.errorListeners = [];
     this.isInitialized = false;
-    console.log('StereoPlayerService: Cleaned up');
+    logger.debug('StereoPlayerService: Cleaned up');
   }
 
   // Private methods
@@ -539,12 +540,12 @@ export class StereoPlayerService {
       channel === 'left' ? this.leftChannelIndex : this.rightChannelIndex;
 
     if (currentIndex >= statements.length) {
-      console.log(`StereoPlayerService: ${type} channel completed`);
+      logger.debug(`StereoPlayerService: ${type} channel completed`);
       return;
     }
 
     const statement = statements[currentIndex];
-    console.log(
+    logger.debug(
       `StereoPlayerService: Playing ${type} channel statement ${currentIndex + 1}/${statements.length}:`,
       statement.text.substring(0, 50) + '...'
     );
@@ -581,7 +582,7 @@ export class StereoPlayerService {
       // Update playback state
       this.updatePlaybackState(channel, true, statement);
     } catch (error) {
-      console.error(
+      logger.error(
         `StereoPlayerService: Failed to play ${channel} channel statement:`,
         error
       );
@@ -617,13 +618,13 @@ export class StereoPlayerService {
         useCache: this.config.useAudioCache,
       };
 
-      console.log('StereoPlayerService: Attempting cloud TTS generation');
-      console.log('StereoPlayerService: Current language:', currentLanguage);
-      console.log(
+      logger.debug('StereoPlayerService: Attempting cloud TTS generation');
+      logger.debug('StereoPlayerService: Current language:', currentLanguage);
+      logger.debug(
         'StereoPlayerService: TTS options language:',
         ttsOptions.language
       );
-      console.log(
+      logger.debug(
         'StereoPlayerService: Text to synthesize:',
         textInCurrentLanguage.substring(0, 50) + '...'
       );
@@ -636,7 +637,7 @@ export class StereoPlayerService {
         return `data:audio/mpeg;base64,${result.audioContent}`;
       }
     } catch (error) {
-      console.error('StereoPlayerService: Cloud TTS failed:', error);
+      logger.error('StereoPlayerService: Cloud TTS failed:', error);
       throw error; // Don't fallback, let the error propagate
     }
   }
@@ -689,7 +690,7 @@ export class StereoPlayerService {
       channel === 'left' ? this.leftChannelIndex : this.rightChannelIndex;
 
     if (currentIndex >= statements.length) {
-      console.log(`StereoPlayerService: ${channel} channel completed`);
+      logger.debug(`StereoPlayerService: ${channel} channel completed`);
 
       // Check if both channels are complete
       const [leftStatements, rightStatements] = await Promise.all([
@@ -721,7 +722,7 @@ export class StereoPlayerService {
   }
 
   private async onSessionCompleted(): Promise<void> {
-    console.log('StereoPlayerService: Session completed');
+    logger.debug('StereoPlayerService: Session completed');
 
     try {
       // Stop all sounds first
@@ -754,7 +755,7 @@ export class StereoPlayerService {
         await this.unloadAllSounds();
       }, 500);
     } catch (error) {
-      console.error('StereoPlayerService: Error completing session:', error);
+      logger.error('StereoPlayerService: Error completing session:', error);
       // Still update state even if cleanup fails
       this.updateState({
         isPlaying: false,
@@ -850,7 +851,7 @@ export class StereoPlayerService {
         this.activeTimeouts.add(timeoutId);
       }
     } catch (error) {
-      console.error(
+      logger.error(
         'StereoPlayerService: Failed to restart statement scheduling:',
         error
       );
@@ -873,7 +874,7 @@ export class StereoPlayerService {
           }
         } catch (error) {
           // Ignore errors for non-existent or already unloaded players
-          console.log('StereoPlayerService: Sound already stopped or unloaded');
+          logger.debug('StereoPlayerService: Sound already stopped or unloaded');
         }
       })
     );
@@ -895,7 +896,7 @@ export class StereoPlayerService {
           }
         } catch (error) {
           // Ignore errors for non-existent or already unloaded players
-          console.log('StereoPlayerService: Sound already unloaded or does not exist');
+          logger.debug('StereoPlayerService: Sound already unloaded or does not exist');
         }
       })
     );
@@ -948,7 +949,7 @@ export class StereoPlayerService {
       try {
         listener(this.state);
       } catch (error) {
-        console.error(
+        logger.error(
           'Error in StereoPlayerService state change listener:',
           error
         );
@@ -962,7 +963,7 @@ export class StereoPlayerService {
       try {
         listener(error);
       } catch (listenerError) {
-        console.error(
+        logger.error(
           'Error in StereoPlayerService error listener:',
           listenerError
         );

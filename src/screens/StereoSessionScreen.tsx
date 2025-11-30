@@ -24,6 +24,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { StandardHeader } from '../components/StandardHeader';
 // import { StatementCard } from '../components/StatementCard';
 import { SessionEditScreen } from './SessionEditScreen';
+import { logger } from '../utils/logger';
 import {
   StereoSession,
   StereoSessionCategory,
@@ -61,7 +62,7 @@ const StatementsListContent: React.FC<{ session: StereoSession }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log(
+    logger.debug(
       'StatementsListContent: Loading statements for language:',
       currentLanguage
     );
@@ -71,35 +72,35 @@ const StatementsListContent: React.FC<{ session: StereoSession }> = ({
   const loadStatements = async () => {
     try {
       setIsLoading(true);
-      console.log(
+      logger.debug(
         'StatementsListContent: Loading statements for session:',
         session.id
       );
-      console.log('StatementsListContent: Current language:', currentLanguage);
+      logger.debug('StatementsListContent: Current language:', currentLanguage);
       const [left, right] = await Promise.all([
         stereoSessionService.getChannelStatements(session, 'left'),
         stereoSessionService.getChannelStatements(session, 'right'),
       ]);
-      console.log(
+      logger.debug(
         'StatementsListContent: Loaded left statements:',
         left.length
       );
-      console.log(
+      logger.debug(
         'StatementsListContent: Loaded right statements:',
         right.length
       );
-      console.log(
+      logger.debug(
         'StatementsListContent: Left statement IDs:',
         left.map(s => s.id)
       );
-      console.log(
+      logger.debug(
         'StatementsListContent: Right statement IDs:',
         right.map(s => s.id)
       );
       setLeftStatements(left);
       setRightStatements(right);
     } catch (error) {
-      console.error('Failed to load statements:', error);
+      logger.error('Failed to load statements:', error);
     } finally {
       setIsLoading(false);
     }
@@ -175,10 +176,10 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
   onBack,
   onSessionComplete,
 }) => {
-  console.log('StereoSessionScreen: Component loaded');
+  logger.debug('StereoSessionScreen: Component loaded');
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
-  console.log(
+  logger.debug(
     'StereoSessionScreen: Current language from context:',
     currentLanguage
   );
@@ -282,7 +283,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
           if (defaultSession) {
             setSession(defaultSession);
           } else {
-            console.warn(
+            logger.warn(
               'StereoSessionScreen: Could not create default session'
             );
           }
@@ -291,7 +292,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
 
       setIsInitialized(true);
     } catch (error) {
-      console.error('StereoSessionScreen: Failed to initialize:', error);
+      logger.error('StereoSessionScreen: Failed to initialize:', error);
       Alert.alert(
         t('error.title', 'Error'),
         t(
@@ -306,17 +307,17 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
 
   const createDefaultSession = async (): Promise<StereoSession | null> => {
     try {
-      console.log('StereoSessionScreen: Creating default session');
+      logger.debug('StereoSessionScreen: Creating default session');
 
       // Get existing statements from storage
       const allStatements = await storageService.loadStatements();
-      console.log(
+      logger.debug(
         'StereoSessionScreen: Found statements in storage:',
         allStatements.length
       );
 
       if (allStatements.length === 0) {
-        console.log('StereoSessionScreen: No statements available in storage');
+        logger.debug('StereoSessionScreen: No statements available in storage');
         return null;
       }
 
@@ -381,11 +382,11 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
         ? rightChannelStatements 
         : mindfulnessStatements).slice(0, 10).map(s => s.id);
 
-      console.log(
+      logger.debug(
         'StereoSessionScreen: Found left channel statements:',
         leftStatementIds.length
       );
-      console.log(
+      logger.debug(
         'StereoSessionScreen: Found right channel statements:',
         rightStatementIds.length
       );
@@ -415,7 +416,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
         isTemplate: true,
       });
     } catch (error) {
-      console.error(
+      logger.error(
         'StereoSessionScreen: Failed to create default session:',
         error
       );
@@ -432,18 +433,18 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
   };
 
   const handleSaveLeftStatements = async (editedSession: any) => {
-    console.log('StereoSessionScreen: handleSaveLeftStatements called');
-    console.log('StereoSessionScreen: session exists:', !!session);
-    console.log('StereoSessionScreen: editedSession:', editedSession);
+    logger.debug('StereoSessionScreen: handleSaveLeftStatements called');
+    logger.debug('StereoSessionScreen: session exists:', !!session);
+    logger.debug('StereoSessionScreen: editedSession:', editedSession);
 
     if (!session) {
-      console.log('StereoSessionScreen: No session, returning early');
+      logger.debug('StereoSessionScreen: No session, returning early');
       return;
     }
 
     try {
-      console.log('StereoSessionScreen: Starting save process...');
-      console.log(
+      logger.debug('StereoSessionScreen: Starting save process...');
+      logger.debug(
         'StereoSessionScreen: Statement IDs to save:',
         editedSession.statementIds
       );
@@ -455,24 +456,24 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
         }
       );
 
-      console.log(
+      logger.debug(
         'StereoSessionScreen: Update successful, updated session:',
         updatedSession
       );
-      console.log(
+      logger.debug(
         'StereoSessionScreen: Left channel count:',
         updatedSession.leftChannelStatementIds.length
       );
 
-      console.log('StereoSessionScreen: Setting new session state...');
+      logger.debug('StereoSessionScreen: Setting new session state...');
       setSession(updatedSession);
 
-      console.log('StereoSessionScreen: Closing edit modal...');
+      logger.debug('StereoSessionScreen: Closing edit modal...');
       setShowEditLeft(false);
 
-      console.log('StereoSessionScreen: Save process completed successfully');
+      logger.debug('StereoSessionScreen: Save process completed successfully');
     } catch (error) {
-      console.error(
+      logger.error(
         'StereoSessionScreen: Failed to save left channel statements:',
         error
       );
@@ -487,11 +488,11 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
     if (!session) return;
 
     try {
-      console.log(
+      logger.debug(
         'StereoSessionScreen: Saving right channel statements:',
         editedSession
       );
-      console.log(
+      logger.debug(
         'StereoSessionScreen: Statement IDs to save:',
         editedSession.statementIds
       );
@@ -503,8 +504,8 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
         }
       );
 
-      console.log('StereoSessionScreen: Updated session:', updatedSession);
-      console.log(
+      logger.debug('StereoSessionScreen: Updated session:', updatedSession);
+      logger.debug(
         'StereoSessionScreen: Right channel count:',
         updatedSession.rightChannelStatementIds.length
       );
@@ -512,7 +513,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
       setSession(updatedSession);
       setShowEditRight(false);
     } catch (error) {
-      console.error('Failed to save right channel statements:', error);
+      logger.error('Failed to save right channel statements:', error);
       Alert.alert(
         t('error.title', 'Error'),
         t('error.saveFailed', 'Failed to save statements')
@@ -529,7 +530,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
       await stereoPlayerService.stopPlayback();
       await stereoPlayerService.playSession(session, currentLanguage);
     } catch (error) {
-      console.error('Failed to start playback:', error);
+      logger.error('Failed to start playback:', error);
       Alert.alert(
         t('error.title', 'Error'),
         t('error.playbackFailed', 'Failed to start playback')
@@ -541,7 +542,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
     try {
       await stereoPlayerService.pausePlayback();
     } catch (error) {
-      console.error('Failed to pause playback:', error);
+      logger.error('Failed to pause playback:', error);
     }
   };
 
@@ -549,7 +550,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
     try {
       await stereoPlayerService.resumePlayback();
     } catch (error) {
-      console.error('Failed to resume playback:', error);
+      logger.error('Failed to resume playback:', error);
     }
   };
 
@@ -560,7 +561,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
       // Immediately rewind to start after stopping
       setPlaybackState(null);
     } catch (error) {
-      console.error('Failed to stop playback:', error);
+      logger.error('Failed to stop playback:', error);
     }
   };
 
@@ -615,7 +616,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
       // Reset playback state to initial state
       setPlaybackState(null);
     } catch (error) {
-      console.error('StereoSessionScreen: Failed to rewind session:', error);
+      logger.error('StereoSessionScreen: Failed to rewind session:', error);
     }
   };
 

@@ -4,6 +4,7 @@
  */
 
 import { IAudioHandler } from './IAudioHandler';
+import { logger } from '../../utils/logger';
 
 export class WebAudioHandler implements IAudioHandler {
   private audioContext: AudioContext | null = null;
@@ -21,7 +22,7 @@ export class WebAudioHandler implements IAudioHandler {
     }
 
     try {
-      console.log('WebAudioHandler: Initializing Web Audio API');
+      logger.debug('WebAudioHandler: Initializing Web Audio API');
 
       // Create AudioContext
       const AudioContextClass =
@@ -36,9 +37,9 @@ export class WebAudioHandler implements IAudioHandler {
       this.gainNode.connect(this.audioContext.destination);
 
       this.isInitialized = true;
-      console.log('WebAudioHandler: Initialized successfully');
+      logger.debug('WebAudioHandler: Initialized successfully');
     } catch (error) {
-      console.error('WebAudioHandler: Failed to initialize:', error);
+      logger.error('WebAudioHandler: Failed to initialize:', error);
       throw error;
     }
   }
@@ -46,7 +47,7 @@ export class WebAudioHandler implements IAudioHandler {
   async loadAudio(source: any): Promise<void> {
     try {
       // Create HTML audio element for Web Audio API
-      console.log('WebAudioHandler: Creating HTML audio element');
+      logger.debug('WebAudioHandler: Creating HTML audio element');
       this.audioElement = document.createElement('audio');
       this.audioElement.loop = true;
       this.audioElement.preload = 'auto';
@@ -71,9 +72,9 @@ export class WebAudioHandler implements IAudioHandler {
       // Disconnect default connection and connect through gain node
       this.mediaElementSource.connect(this.gainNode!);
 
-      console.log('WebAudioHandler: Audio loaded successfully');
+      logger.debug('WebAudioHandler: Audio loaded successfully');
     } catch (error) {
-      console.error('WebAudioHandler: Failed to load audio:', error);
+      logger.error('WebAudioHandler: Failed to load audio:', error);
       throw error;
     }
   }
@@ -93,9 +94,9 @@ export class WebAudioHandler implements IAudioHandler {
 
         await this.audioElement.play();
         this.playing = true;
-        console.log('WebAudioHandler: Started playing audio');
+        logger.debug('WebAudioHandler: Started playing audio');
       } catch (error) {
-        console.error('WebAudioHandler: Failed to play audio:', error);
+        logger.error('WebAudioHandler: Failed to play audio:', error);
         throw error;
       }
     }
@@ -131,9 +132,9 @@ export class WebAudioHandler implements IAudioHandler {
         }, 50);
 
         this.playing = false;
-        console.log('WebAudioHandler: Paused audio');
+        logger.debug('WebAudioHandler: Paused audio');
       } catch (error) {
-        console.error('WebAudioHandler: Failed to pause audio:', error);
+        logger.error('WebAudioHandler: Failed to pause audio:', error);
         throw error;
       }
     }
@@ -149,9 +150,9 @@ export class WebAudioHandler implements IAudioHandler {
 
         await this.audioElement.play();
         this.playing = true;
-        console.log('WebAudioHandler: Resumed audio');
+        logger.debug('WebAudioHandler: Resumed audio');
       } catch (error) {
-        console.error('WebAudioHandler: Failed to resume audio:', error);
+        logger.error('WebAudioHandler: Failed to resume audio:', error);
         throw error;
       }
     }
@@ -188,9 +189,9 @@ export class WebAudioHandler implements IAudioHandler {
         }, 100);
 
         this.playing = false;
-        console.log('WebAudioHandler: Stopped audio');
+        logger.debug('WebAudioHandler: Stopped audio');
       } catch (error) {
-        console.error('WebAudioHandler: Failed to stop audio:', error);
+        logger.error('WebAudioHandler: Failed to stop audio:', error);
         throw error;
       }
     }
@@ -202,9 +203,9 @@ export class WebAudioHandler implements IAudioHandler {
     if (this.gainNode) {
       try {
         this.gainNode.gain.value = this.volume;
-        console.log('WebAudioHandler: Set volume to', this.volume);
+        logger.debug('WebAudioHandler: Set volume to', this.volume);
       } catch (error) {
-        console.error('WebAudioHandler: Failed to set volume:', error);
+        logger.error('WebAudioHandler: Failed to set volume:', error);
         throw error;
       }
     }
@@ -224,7 +225,7 @@ export class WebAudioHandler implements IAudioHandler {
 
       for (let i = 0; i < fadeSteps; i++) {
         if (this.fadeoutCancelled) {
-          console.log('WebAudioHandler: Fadeout cancelled');
+          logger.debug('WebAudioHandler: Fadeout cancelled');
           return;
         }
 
@@ -237,7 +238,7 @@ export class WebAudioHandler implements IAudioHandler {
       }
 
       if (this.fadeoutCancelled) {
-        console.log('WebAudioHandler: Fadeout cancelled before final stop');
+        logger.debug('WebAudioHandler: Fadeout cancelled before final stop');
         return;
       }
 
@@ -252,13 +253,13 @@ export class WebAudioHandler implements IAudioHandler {
       this.playing = false;
       this.volume = startVolume;
 
-      console.log(
+      logger.debug(
         'WebAudioHandler: Faded out audio over',
         durationSeconds,
         'seconds'
       );
     } catch (error) {
-      console.error('WebAudioHandler: Failed to fade out audio:', error);
+      logger.error('WebAudioHandler: Failed to fade out audio:', error);
       await this.stop();
     }
   }
@@ -286,7 +287,7 @@ export class WebAudioHandler implements IAudioHandler {
         this.mediaElementSource.disconnect();
         this.mediaElementSource = null;
       } catch (error) {
-        console.warn(
+        logger.warn(
           'WebAudioHandler: Failed to disconnect media element source:',
           error
         );
@@ -298,7 +299,7 @@ export class WebAudioHandler implements IAudioHandler {
         this.gainNode.disconnect();
         this.gainNode = null;
       } catch (error) {
-        console.warn('WebAudioHandler: Failed to disconnect gain node:', error);
+        logger.warn('WebAudioHandler: Failed to disconnect gain node:', error);
       }
     }
 
@@ -307,7 +308,7 @@ export class WebAudioHandler implements IAudioHandler {
         await this.audioContext.close();
         this.audioContext = null;
       } catch (error) {
-        console.warn('WebAudioHandler: Failed to close audio context:', error);
+        logger.warn('WebAudioHandler: Failed to close audio context:', error);
       }
     }
 
@@ -315,6 +316,6 @@ export class WebAudioHandler implements IAudioHandler {
     this.isInitialized = false;
     this.playing = false;
 
-    console.log('WebAudioHandler: Cleaned up resources');
+    logger.debug('WebAudioHandler: Cleaned up resources');
   }
 }

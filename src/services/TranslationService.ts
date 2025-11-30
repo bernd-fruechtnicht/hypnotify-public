@@ -85,16 +85,16 @@ export class TranslationService {
   public async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    console.log('TranslationService: Initializing...');
+    logger.debug('TranslationService: Initializing...');
 
     try {
       // Initialize any required services
       this.isInitialized = true;
       this.updateState({ isInitialized: true });
 
-      console.log('TranslationService: Initialized successfully');
+      logger.debug('TranslationService: Initialized successfully');
     } catch (error) {
-      console.error('TranslationService: Initialization failed:', error);
+      logger.error('TranslationService: Initialization failed:', error);
       throw error;
     }
   }
@@ -117,7 +117,7 @@ export class TranslationService {
       if (options.useCache !== false) {
         const cachedResult = this.translationCache.get(cacheKey);
         if (cachedResult && this.isCacheValid(cachedResult, options.cacheTTL)) {
-          console.log('TranslationService: Cache hit for translation');
+          logger.debug('TranslationService: Cache hit for translation');
           this.updateStatistics({ cacheHits: 1 });
           return {
             ...cachedResult,
@@ -127,11 +127,11 @@ export class TranslationService {
         }
       }
 
-      console.log(
+      logger.debug(
         'TranslationService: Translating text:',
         options.text.substring(0, 50) + '...'
       );
-      console.log(
+      logger.debug(
         'TranslationService: From',
         options.sourceLanguage || 'auto',
         'to',
@@ -159,7 +159,7 @@ export class TranslationService {
         processingTime: Date.now() - startTime,
       };
     } catch (error) {
-      console.error('TranslationService: Translation failed:', error);
+      logger.error('TranslationService: Translation failed:', error);
       this.updateStatistics({ failedTranslations: 1 });
       this.notifyErrorListeners(error as Error);
       throw error;
@@ -203,7 +203,7 @@ export class TranslationService {
         confidence: detection.confidence,
       };
     } catch (error) {
-      console.error('TranslationService: Language detection failed:', error);
+      logger.error('TranslationService: Language detection failed:', error);
       throw error;
     }
   }
@@ -369,7 +369,7 @@ export class TranslationService {
         processingTime: 0,
       };
     } catch (error) {
-      console.error('TranslationService: Translation API error:', error);
+      logger.error('TranslationService: Translation API error:', error);
       throw error;
     }
   }

@@ -17,7 +17,7 @@ export function filterVoicesByLanguage(voices: any[], language: string): any[] {
   return voices.filter(voice => {
     const voiceLang = voice.lang.toLowerCase();
 
-    console.log(
+    logger.debug(
       `VoiceUtils: Checking voice: ${voice.name} (${voice.lang}) for language: ${targetLang}`
     );
 
@@ -28,7 +28,7 @@ export function filterVoicesByLanguage(voices: any[], language: string): any[] {
       voiceLang.startsWith(targetLang + '_') ||
       voiceLang === targetLang;
 
-    console.log(
+    logger.debug(
       `VoiceUtils: Voice ${voice.name} (${voice.lang}) - starts with ${targetLang}: ${langMatch}`
     );
 

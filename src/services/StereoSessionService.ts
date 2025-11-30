@@ -18,6 +18,7 @@ import {
 } from '../types/StereoSession';
 import { MeditationStatement, ApiError } from '../types';
 import { storageService } from './StorageService';
+import { logger } from '../utils/logger';
 
 export interface StereoSessionServiceState {
   /** Whether the service is initialized */
@@ -75,7 +76,7 @@ export class StereoSessionService {
     }
 
     try {
-      console.log('StereoSessionService: Initializing...');
+      logger.debug('StereoSessionService: Initializing...');
 
       // Load sessions from storage
       await this.loadSessionsFromStorage();
@@ -99,7 +100,7 @@ export class StereoSessionService {
         );
 
         if (sessionsWithInvalidIds.length > 0) {
-          console.log(
+          logger.debug(
             'StereoSessionService: Found sessions with invalid statement IDs, recreating...'
           );
           // Clear old sessions and recreate with valid IDs
@@ -116,9 +117,9 @@ export class StereoSessionService {
         templateSessions: this.getTemplateSessionsCount(),
       });
 
-      console.log('StereoSessionService: Initialized successfully');
+      logger.debug('StereoSessionService: Initialized successfully');
     } catch (error) {
-      console.error('StereoSessionService: Initialization failed:', error);
+      logger.error('StereoSessionService: Initialization failed:', error);
       // Don't throw error, just mark as initialized with empty state
       this.isInitialized = true;
       this.updateState({
@@ -144,7 +145,7 @@ export class StereoSessionService {
     this.updateState({ isLoading: true, error: undefined });
 
     try {
-      console.log('StereoSessionService: Creating new session:', input.name);
+      logger.debug('StereoSessionService: Creating new session:', input.name);
 
       // Validate input
       const validationErrors = validateStereoSession(
@@ -192,7 +193,7 @@ export class StereoSessionService {
       try {
         await this.saveSessionsToStorage();
       } catch (storageError) {
-        console.warn(
+        logger.warn(
           'StereoSessionService: Failed to save session to storage:',
           storageError
         );
@@ -204,7 +205,7 @@ export class StereoSessionService {
         userCreatedSessions: this.getUserCreatedSessionsCount(),
       });
 
-      console.log(
+      logger.debug(
         'StereoSessionService: Session created successfully:',
         session.id
       );
@@ -240,17 +241,17 @@ export class StereoSessionService {
     this.updateState({ isLoading: true, error: undefined });
 
     try {
-      console.log('StereoSessionService: Updating session:', id);
-      console.log('StereoSessionService: Update input:', input);
+      logger.debug('StereoSessionService: Updating session:', id);
+      logger.debug('StereoSessionService: Update input:', input);
 
       const existingSession = this.sessions.get(id);
-      console.log(
+      logger.debug(
         'StereoSessionService: Existing session found:',
         !!existingSession
       );
 
       if (!existingSession) {
-        console.log('StereoSessionService: Session not found, throwing error');
+        logger.debug('StereoSessionService: Session not found, throwing error');
         const apiError = this.createApiError(
           'SESSION_NOT_FOUND',
           `Session with id ${id} not found`,
@@ -261,18 +262,18 @@ export class StereoSessionService {
       }
 
       // Validate input
-      console.log('StereoSessionService: Validating input...');
+      logger.debug('StereoSessionService: Validating input...');
       const updatedSession = { ...existingSession, ...input };
-      console.log(
+      logger.debug(
         'StereoSessionService: Updated session object:',
         updatedSession
       );
 
       const validationErrors = validateStereoSession(updatedSession);
-      console.log('StereoSessionService: Validation errors:', validationErrors);
+      logger.debug('StereoSessionService: Validation errors:', validationErrors);
 
       if (validationErrors.length > 0) {
-        console.log('StereoSessionService: Validation failed, throwing error');
+        logger.debug('StereoSessionService: Validation failed, throwing error');
         const apiError = this.createApiError(
           'VALIDATION_FAILED',
           'Session validation failed',
@@ -284,24 +285,24 @@ export class StereoSessionService {
       }
 
       // Update session
-      console.log('StereoSessionService: Creating final session object...');
+      logger.debug('StereoSessionService: Creating final session object...');
       const session: StereoSession = {
         ...updatedSession,
         updatedAt: new Date(),
       };
-      console.log('StereoSessionService: Final session object:', session);
+      logger.debug('StereoSessionService: Final session object:', session);
 
       // Save to storage
-      console.log('StereoSessionService: Saving to sessions map...');
+      logger.debug('StereoSessionService: Saving to sessions map...');
       this.sessions.set(session.id, session);
 
-      console.log('StereoSessionService: Saving to storage...');
+      logger.debug('StereoSessionService: Saving to storage...');
       await this.saveSessionsToStorage();
-      console.log('StereoSessionService: Storage save completed');
+      logger.debug('StereoSessionService: Storage save completed');
 
       this.updateState({ isLoading: false });
 
-      console.log(
+      logger.debug(
         'StereoSessionService: Session updated successfully:',
         session.id
       );
@@ -334,7 +335,7 @@ export class StereoSessionService {
     this.updateState({ isLoading: true, error: undefined });
 
     try {
-      console.log('StereoSessionService: Deleting session:', id);
+      logger.debug('StereoSessionService: Deleting session:', id);
 
       const session = this.sessions.get(id);
       if (!session) {
@@ -358,7 +359,7 @@ export class StereoSessionService {
         templateSessions: this.getTemplateSessionsCount(),
       });
 
-      console.log('StereoSessionService: Session deleted successfully:', id);
+      logger.debug('StereoSessionService: Session deleted successfully:', id);
     } catch (error) {
       this.updateState({ isLoading: false });
 
@@ -462,7 +463,7 @@ export class StereoSessionService {
       this.sessions.set(id, updatedSession);
       await this.saveSessionsToStorage();
     } catch (error) {
-      console.error(
+      logger.error(
         'StereoSessionService: Failed to update session statistics:',
         error
       );
@@ -559,7 +560,7 @@ export class StereoSessionService {
     );
 
     if (missingIds.length > 0) {
-      console.warn(
+      logger.warn(
         `StereoSessionService: Missing statements in ${channel} channel:`,
         missingIds
       );
@@ -570,7 +571,7 @@ export class StereoSessionService {
       );
 
       if (validIds.length !== statementIds.length) {
-        console.log(
+        logger.debug(
           `StereoSessionService: Auto-cleaning invalid statement IDs from ${channel} channel`
         );
         await this.updateSession(session.id, {
@@ -610,7 +611,7 @@ export class StereoSessionService {
           validLeftIds.length !== session.leftChannelStatementIds.length ||
           validRightIds.length !== session.rightChannelStatementIds.length
         ) {
-          console.log(
+          logger.debug(
             `StereoSessionService: Cleaning up invalid IDs in session ${sessionId}`
           );
 
@@ -628,10 +629,10 @@ export class StereoSessionService {
 
       if (hasChanges) {
         await this.saveSessionsToStorage();
-        console.log('StereoSessionService: Cleaned up invalid statement IDs');
+        logger.debug('StereoSessionService: Cleaned up invalid statement IDs');
       }
     } catch (error) {
-      console.error(
+      logger.error(
         'StereoSessionService: Failed to cleanup invalid sessions:',
         error
       );
@@ -646,7 +647,7 @@ export class StereoSessionService {
     this.stateChangeListeners = [];
     this.errorListeners = [];
     this.isInitialized = false;
-    console.log('StereoSessionService: Cleaned up');
+    logger.debug('StereoSessionService: Cleaned up');
   }
 
   // Private methods
@@ -705,7 +706,7 @@ export class StereoSessionService {
 
             this.sessions.set(session.id, session);
           } catch (sessionError) {
-            console.warn(
+            logger.warn(
               'StereoSessionService: Failed to load session:',
               session.id,
               sessionError
@@ -718,22 +719,22 @@ export class StereoSessionService {
           try {
             await this.saveSessionsToStorage();
           } catch (saveError) {
-            console.warn(
+            logger.warn(
               'StereoSessionService: Failed to save migrated sessions:',
               saveError
             );
           }
         }
-        console.log(
+        logger.debug(
           'StereoSessionService: Loaded',
           this.sessions.size,
           'sessions from storage'
         );
       } else {
-        console.log('StereoSessionService: No sessions found in storage');
+        logger.debug('StereoSessionService: No sessions found in storage');
       }
     } catch (error) {
-      console.warn(
+      logger.warn(
         'StereoSessionService: Failed to load sessions from storage:',
         error
       );
@@ -743,25 +744,25 @@ export class StereoSessionService {
 
   private async saveSessionsToStorage(): Promise<void> {
     try {
-      console.log('StereoSessionService: Starting saveSessionsToStorage...');
+      logger.debug('StereoSessionService: Starting saveSessionsToStorage...');
       const sessionsArray = Array.from(this.sessions.values());
-      console.log(
+      logger.debug(
         'StereoSessionService: Sessions to save:',
         sessionsArray.length
       );
-      console.log(
+      logger.debug(
         'StereoSessionService: Calling storageService.saveStereoSessions...'
       );
 
       await storageService.saveStereoSessions(sessionsArray);
-      console.log('StereoSessionService: Storage service save completed');
-      console.log(
+      logger.debug('StereoSessionService: Storage service save completed');
+      logger.debug(
         'StereoSessionService: Saved',
         sessionsArray.length,
         'sessions to storage'
       );
     } catch (error) {
-      console.error(
+      logger.error(
         'StereoSessionService: Failed to save sessions to storage:',
         error
       );
@@ -771,17 +772,17 @@ export class StereoSessionService {
 
   private async createDefaultSessions(): Promise<void> {
     try {
-      console.log('StereoSessionService: Creating default sessions');
+      logger.debug('StereoSessionService: Creating default sessions');
 
       // Load actual statements to get real IDs
       const allStatements = await storageService.loadStatements();
-      console.log(
+      logger.debug(
         'StereoSessionService: Loaded statements:',
         allStatements.length
       );
 
       if (allStatements.length === 0) {
-        console.log(
+        logger.debug(
           'StereoSessionService: No statements available, skipping default session creation'
         );
         return;
@@ -848,11 +849,11 @@ export class StereoSessionService {
         ? rightChannelStatements 
         : mindfulnessStatements).slice(0, 10).map(s => s.id);
 
-      console.log(
+      logger.debug(
         'StereoSessionService: Using left channel IDs:',
         leftChannelIds
       );
-      console.log(
+      logger.debug(
         'StereoSessionService: Using right channel IDs:',
         rightChannelIds
       );
@@ -909,15 +910,15 @@ export class StereoSessionService {
       try {
         await this.saveSessionsToStorage();
       } catch (storageError) {
-        console.warn(
+        logger.warn(
           'StereoSessionService: Failed to save default session to storage:',
           storageError
         );
       }
 
-      console.log('StereoSessionService: Default session created successfully');
+      logger.debug('StereoSessionService: Default session created successfully');
     } catch (error) {
-      console.error(
+      logger.error(
         'StereoSessionService: Failed to create default sessions:',
         error
       );
@@ -1056,7 +1057,7 @@ export class StereoSessionService {
       try {
         listener(this.state);
       } catch (error) {
-        console.error(
+        logger.error(
           'Error in StereoSessionService state change listener:',
           error
         );
@@ -1070,7 +1071,7 @@ export class StereoSessionService {
       try {
         listener(error);
       } catch (listenerError) {
-        console.error(
+        logger.error(
           'Error in StereoSessionService error listener:',
           listenerError
         );

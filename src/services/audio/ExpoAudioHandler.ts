@@ -5,6 +5,7 @@
 
 import { Audio } from 'expo-av';
 import { IAudioHandler } from './IAudioHandler';
+import { logger } from '../../utils/logger';
 
 export class ExpoAudioHandler implements IAudioHandler {
   private sound: Audio.Sound | null = null;
@@ -18,7 +19,7 @@ export class ExpoAudioHandler implements IAudioHandler {
       return;
     }
     this.isInitialized = true;
-    console.log('ExpoAudioHandler: Initialized');
+    logger.debug('ExpoAudioHandler: Initialized');
   }
 
   async loadAudio(source: any): Promise<void> {
@@ -30,9 +31,9 @@ export class ExpoAudioHandler implements IAudioHandler {
       });
 
       this.sound = sound;
-      console.log('ExpoAudioHandler: Audio loaded successfully');
+      logger.debug('ExpoAudioHandler: Audio loaded successfully');
     } catch (error) {
-      console.error('ExpoAudioHandler: Failed to load audio:', error);
+      logger.error('ExpoAudioHandler: Failed to load audio:', error);
       throw error;
     }
   }
@@ -43,9 +44,9 @@ export class ExpoAudioHandler implements IAudioHandler {
         await this.sound.setPositionAsync(0);
         await this.sound.playAsync();
         this.playing = true;
-        console.log('ExpoAudioHandler: Started playing audio');
+        logger.debug('ExpoAudioHandler: Started playing audio');
       } catch (error) {
-        console.error('ExpoAudioHandler: Failed to play audio:', error);
+        logger.error('ExpoAudioHandler: Failed to play audio:', error);
         throw error;
       }
     }
@@ -57,9 +58,9 @@ export class ExpoAudioHandler implements IAudioHandler {
         this.cancelFadeout();
         await this.sound.pauseAsync();
         this.playing = false;
-        console.log('ExpoAudioHandler: Paused audio');
+        logger.debug('ExpoAudioHandler: Paused audio');
       } catch (error) {
-        console.error('ExpoAudioHandler: Failed to pause audio:', error);
+        logger.error('ExpoAudioHandler: Failed to pause audio:', error);
         throw error;
       }
     }
@@ -70,9 +71,9 @@ export class ExpoAudioHandler implements IAudioHandler {
       try {
         await this.sound.playAsync();
         this.playing = true;
-        console.log('ExpoAudioHandler: Resumed audio');
+        logger.debug('ExpoAudioHandler: Resumed audio');
       } catch (error) {
-        console.error('ExpoAudioHandler: Failed to resume audio:', error);
+        logger.error('ExpoAudioHandler: Failed to resume audio:', error);
         throw error;
       }
     }
@@ -85,9 +86,9 @@ export class ExpoAudioHandler implements IAudioHandler {
         await this.sound.pauseAsync();
         await this.sound.setPositionAsync(0);
         this.playing = false;
-        console.log('ExpoAudioHandler: Stopped audio');
+        logger.debug('ExpoAudioHandler: Stopped audio');
       } catch (error) {
-        console.error('ExpoAudioHandler: Failed to stop audio:', error);
+        logger.error('ExpoAudioHandler: Failed to stop audio:', error);
         throw error;
       }
     }
@@ -99,9 +100,9 @@ export class ExpoAudioHandler implements IAudioHandler {
     if (this.sound) {
       try {
         await this.sound.setVolumeAsync(this.volume);
-        console.log('ExpoAudioHandler: Set volume to', this.volume);
+        logger.debug('ExpoAudioHandler: Set volume to', this.volume);
       } catch (error) {
-        console.error('ExpoAudioHandler: Failed to set volume:', error);
+        logger.error('ExpoAudioHandler: Failed to set volume:', error);
         throw error;
       }
     }
@@ -121,7 +122,7 @@ export class ExpoAudioHandler implements IAudioHandler {
 
       for (let i = 0; i < fadeSteps; i++) {
         if (this.fadeoutCancelled) {
-          console.log('ExpoAudioHandler: Fadeout cancelled');
+          logger.debug('ExpoAudioHandler: Fadeout cancelled');
           return;
         }
 
@@ -131,7 +132,7 @@ export class ExpoAudioHandler implements IAudioHandler {
       }
 
       if (this.fadeoutCancelled) {
-        console.log('ExpoAudioHandler: Fadeout cancelled before final stop');
+        logger.debug('ExpoAudioHandler: Fadeout cancelled before final stop');
         return;
       }
 
@@ -140,13 +141,13 @@ export class ExpoAudioHandler implements IAudioHandler {
       this.playing = false;
       this.volume = startVolume;
 
-      console.log(
+      logger.debug(
         'ExpoAudioHandler: Faded out audio over',
         durationSeconds,
         'seconds'
       );
     } catch (error) {
-      console.error('ExpoAudioHandler: Failed to fade out audio:', error);
+      logger.error('ExpoAudioHandler: Failed to fade out audio:', error);
       await this.stop();
     }
   }
@@ -174,9 +175,9 @@ export class ExpoAudioHandler implements IAudioHandler {
         this.sound = null;
         this.playing = false;
         this.isInitialized = false;
-        console.log('ExpoAudioHandler: Cleaned up resources');
+        logger.debug('ExpoAudioHandler: Cleaned up resources');
       } catch (error) {
-        console.error('ExpoAudioHandler: Failed to cleanup:', error);
+        logger.error('ExpoAudioHandler: Failed to cleanup:', error);
       }
     }
   }

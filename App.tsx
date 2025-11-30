@@ -26,6 +26,7 @@ import { SessionEditScreen } from './src/screens/SessionEditScreen';
 import { StereoSessionScreen } from './src/screens/StereoSessionScreen';
 import { initializeServices, getServiceHealth } from './src/services';
 import { MeditationSession } from './src/types';
+import { logger } from './src/utils/logger';
 
 type AppScreen =
   | 'home'
@@ -82,7 +83,7 @@ const AppContent: React.FC = () => {
   };
 
   const handleSessionEdit = (session: MeditationSession) => {
-    console.log('handleSessionEdit called with session:', session.name);
+    logger.debug('handleSessionEdit called with session:', session.name);
     setEditingSession(session);
     setShowSessionManager(false);
     setShowSessionEdit(true);
@@ -96,7 +97,7 @@ const AppContent: React.FC = () => {
       setShowSessionEdit(false);
       setShowSessionManager(true); // Return to Session Manager
     } catch (error) {
-      console.error('Failed to save session:', error);
+      logger.error('Failed to save session:', error);
     }
   };
 
@@ -117,7 +118,7 @@ const AppContent: React.FC = () => {
         const health = await getServiceHealth();
         setServiceHealth(health);
       } catch (error) {
-        console.error('Failed to initialize services:', error);
+        logger.error('Failed to initialize services:', error);
         setServicesInitialized(true); // Still show the app even if services fail
       }
     };
@@ -148,13 +149,13 @@ const AppContent: React.FC = () => {
           <View style={styles.screenContainer}>
             <LibraryScreen
               onStatementSelect={statement => {
-                console.log('Selected statement:', statement);
+                logger.debug('Selected statement:', statement);
               }}
               onStatementEdit={statement => {
-                console.log('Edit statement:', statement);
+                logger.debug('Edit statement:', statement);
               }}
               onStatementDelete={statement => {
-                console.log('Delete statement:', statement);
+                logger.debug('Delete statement:', statement);
               }}
               onBack={() => setCurrentScreen('home')}
             />
@@ -166,11 +167,11 @@ const AppContent: React.FC = () => {
             <PlayerScreen
               session={currentSession}
               onSessionComplete={() => {
-                console.log('Session completed');
+                logger.debug('Session completed');
                 // Player will stay open and rewind automatically
               }}
-              onSessionPause={() => console.log('Session paused')}
-              onSessionResume={() => console.log('Session resumed')}
+              onSessionPause={() => logger.debug('Session paused')}
+              onSessionResume={() => logger.debug('Session resumed')}
               onSessionStop={() => {
                 setCurrentSession(null);
                 setCurrentScreen('home');
@@ -195,7 +196,7 @@ const AppContent: React.FC = () => {
             <SettingsScreen
               onBack={() => setCurrentScreen('home')}
               onSettingsChange={settings => {
-                console.log('Settings changed:', settings);
+                logger.debug('Settings changed:', settings);
               }}
             />
           </View>
@@ -206,7 +207,7 @@ const AppContent: React.FC = () => {
             <StereoSessionScreen
               onBack={() => setCurrentScreen('home')}
               onSessionComplete={session => {
-                console.log('Stereo session completed:', session);
+                logger.debug('Stereo session completed:', session);
                 setCurrentScreen('home');
               }}
             />
@@ -240,7 +241,7 @@ const AppContent: React.FC = () => {
           <StereoSessionScreen
             onBack={() => setCurrentScreen('home')}
             onSessionComplete={session => {
-              console.log('Stereo session completed:', session.name);
+              logger.debug('Stereo session completed:', session.name);
               setCurrentScreen('home');
             }}
           />
@@ -379,7 +380,7 @@ const AppContent: React.FC = () => {
         onClose={() => setShowSessionManager(false)}
         onSessionSelect={handleSessionSelect}
         onSessionDelete={sessionId => {
-          console.log('Session deleted:', sessionId);
+          logger.debug('Session deleted:', sessionId);
           // Optionally refresh the session list or update UI
         }}
         onSessionEdit={handleSessionEdit}

@@ -5,6 +5,7 @@
 
 import { Platform } from 'react-native';
 import { IAudioHandler } from './IAudioHandler';
+import { logger } from '../../utils/logger';
 import { ExpoAudioHandler } from './ExpoAudioHandler';
 import { WebAudioHandler } from './WebAudioHandler';
 import { IOSWebAudioHandler } from './IOSWebAudioHandler';
@@ -20,17 +21,17 @@ export class AudioHandlerFactory {
       const isIOSWeb = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
       if (isIOSWeb) {
-        console.log(
+        logger.debug(
           'AudioHandlerFactory: Creating iOS Web Audio Handler (Safari/Chrome)'
         );
         return new IOSWebAudioHandler();
       } else {
-        console.log('AudioHandlerFactory: Creating Web Audio Handler');
+        logger.debug('AudioHandlerFactory: Creating Web Audio Handler');
         return new WebAudioHandler();
       }
     } else {
       // Android, iOS native, Electron
-      console.log(
+      logger.debug(
         'AudioHandlerFactory: Creating Expo Audio Handler for',
         Platform.OS
       );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { storageService, backgroundMusicService } from '../services';
 import { AppSettings } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -25,7 +26,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
     const handleBeforeUnload = () => {
       if (isTestMode) {
         backgroundMusicService.stop().catch(error => {
-          console.warn(
+          logger.warn(
             'BackgroundMusicSetup: Failed to stop music on page unload:',
             error
           );
@@ -47,7 +48,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
     return () => {
       // Always try to stop music when component unmounts
       backgroundMusicService.stop().catch(error => {
-        console.warn(
+        logger.warn(
           'BackgroundMusicSetup: Failed to stop music on unmount:',
           error
         );
@@ -60,7 +61,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
     return () => {
       if (isTestMode) {
         backgroundMusicService.stop().catch(error => {
-          console.warn(
+          logger.warn(
             'BackgroundMusicSetup: Failed to stop music on test mode change:',
             error
           );
@@ -75,7 +76,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
         await backgroundMusicService.isBackgroundMusicAvailableAsync();
       setIsMusicAvailable(available);
     } catch (error) {
-      console.error('Failed to check music availability:', error);
+      logger.error('Failed to check music availability:', error);
       setIsMusicAvailable(false);
     }
   };
@@ -85,7 +86,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
       const loadedSettings = await storageService.loadSettings();
       setSettings(loadedSettings);
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      logger.error('Failed to load settings:', error);
     } finally {
       setIsLoading(false);
     }
@@ -109,7 +110,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
 
       await storageService.saveSettings(newSettings);
       setSettings(newSettings);
-      console.log(
+      logger.debug(
         'BackgroundMusicSetup: Updated background music setting:',
         enabled
       );
@@ -121,7 +122,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
         }, 100);
       }
     } catch (error) {
-      console.error('Failed to save background music setting:', error);
+      logger.error('Failed to save background music setting:', error);
     }
   };
 
@@ -133,7 +134,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
         );
         await backgroundMusicService.play();
         setIsTestMode(true);
-        console.log(
+        logger.debug(
           'BackgroundMusicSetup: Test mode started - music playing continuously'
         );
 
@@ -144,12 +145,12 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
           }, 100);
         }
       } else {
-        console.warn(
+        logger.warn(
           'Background music not available - audio file may be missing'
         );
       }
     } catch (error) {
-      console.error('Failed to start test mode:', error);
+      logger.error('Failed to start test mode:', error);
     }
   };
 
@@ -157,15 +158,15 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
     try {
       await backgroundMusicService.stop();
       setIsTestMode(false);
-      console.log('BackgroundMusicSetup: Test mode stopped - music stopped');
+      logger.debug('BackgroundMusicSetup: Test mode stopped - music stopped');
     } catch (error) {
-      console.error('Failed to stop test mode:', error);
+      logger.error('Failed to stop test mode:', error);
     }
   };
 
   const testSpeech = async () => {
     if (!isTestMode) {
-      console.warn(
+      logger.warn(
         'BackgroundMusicSetup: Cannot test speech - test mode not active'
       );
       return;
@@ -174,21 +175,21 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
     try {
       const { ttsService } = await import('../services');
       const testText = t('onboarding.backgroundMusic.testSpeechText');
-      console.log(
+      logger.debug(
         'BackgroundMusicSetup: Playing test speech with background music:',
         testText,
         'language:',
         currentLanguage
       );
       await ttsService.speak(testText, { language: currentLanguage });
-      console.log('BackgroundMusicSetup: Test speech completed');
+      logger.debug('BackgroundMusicSetup: Test speech completed');
     } catch (error) {
-      console.error('Failed to test speech:', error);
+      logger.error('Failed to test speech:', error);
     }
   };
 
   const handleVolumeChange = async (newVolume: number) => {
-    console.log('BackgroundMusicSetup: Volume change, newVolume:', newVolume);
+    logger.debug('BackgroundMusicSetup: Volume change, newVolume:', newVolume);
 
     // Update the volume setting
     if (!settings) return;
@@ -208,7 +209,7 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
 
       await storageService.saveSettings(newSettings);
       setSettings(newSettings);
-      console.log(
+      logger.debug(
         'BackgroundMusicSetup: Updated background music volume:',
         newVolume
       );
@@ -216,13 +217,13 @@ export const BackgroundMusicSetup: React.FC<BackgroundMusicSetupProps> = ({ scro
       // If in test mode, update the music volume in real-time
       if (isTestMode) {
         await backgroundMusicService.setVolume(newVolume);
-        console.log(
+        logger.debug(
           'BackgroundMusicSetup: Updated live music volume to:',
           newVolume
         );
       }
     } catch (error) {
-      console.error('Failed to save background music volume:', error);
+      logger.error('Failed to save background music volume:', error);
     }
   };
 

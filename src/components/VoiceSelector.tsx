@@ -15,6 +15,7 @@ import {
   Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { ttsService } from '../services';
 
 interface Voice {
@@ -61,7 +62,7 @@ export const VoiceSelector: React.FC<VoiceSelectorProps> = ({
       const availableVoices = await ttsService.getAvailableVoices(language);
       setVoices(availableVoices);
     } catch (error) {
-      console.error('VoiceSelector: Failed to load voices:', error);
+      logger.error('VoiceSelector: Failed to load voices:', error);
       Alert.alert(
         t('voiceSelector.error'),
         t('voiceSelector.loadError', 'Failed to load voices. Please try again.')
@@ -91,7 +92,7 @@ export const VoiceSelector: React.FC<VoiceSelectorProps> = ({
         volume: currentSettings?.volume ?? 0.8,
       });
     } catch (error) {
-      console.error('VoiceSelector: Failed to play sample:', error);
+      logger.error('VoiceSelector: Failed to play sample:', error);
       Alert.alert(
         t('voiceSelector.error'),
         t('voiceSelector.playError', 'Failed to play voice sample.')

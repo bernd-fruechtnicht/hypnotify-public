@@ -4,6 +4,7 @@
  */
 
 import { storageService } from './StorageService';
+import { logger } from '../utils/logger';
 import {
   getInitialStatements,
   getStatementsByCategory,
@@ -35,7 +36,7 @@ export class DataSeedingService {
 
       return statements.length > 0 || sessions.length > 0 || settings !== null;
     } catch (error) {
-      console.error('Failed to check if data is seeded:', error);
+      logger.error('Failed to check if data is seeded:', error);
       return false;
     }
   }
@@ -49,7 +50,7 @@ export class DataSeedingService {
     }
 
     try {
-      console.log('Starting data seeding...');
+      logger.debug('Starting data seeding...');
 
       // Seed statements
       await this.seedStatements();
@@ -64,9 +65,9 @@ export class DataSeedingService {
       await this.seedDefaultSettings();
 
       this.isSeeded = true;
-      console.log('Data seeding completed successfully');
+      logger.debug('Data seeding completed successfully');
     } catch (error) {
-      console.error('Failed to seed initial data:', error);
+      logger.error('Failed to seed initial data:', error);
       throw new Error(`Data seeding failed: ${error}`);
     }
   }
@@ -79,16 +80,16 @@ export class DataSeedingService {
       const existingStatements = await storageService.loadStatements();
 
       if (existingStatements.length > 0) {
-        console.log('Statements already exist, skipping seeding');
+        logger.debug('Statements already exist, skipping seeding');
         return;
       }
 
       const initialStatements = getInitialStatements();
       await storageService.saveStatements(initialStatements);
 
-      console.log(`Seeded ${initialStatements.length} meditation statements`);
+      logger.debug(`Seeded ${initialStatements.length} meditation statements`);
     } catch (error) {
-      console.error('Failed to seed statements:', error);
+      logger.error('Failed to seed statements:', error);
       throw error;
     }
   }
@@ -101,16 +102,16 @@ export class DataSeedingService {
       const existingSessions = await storageService.loadSessions();
 
       if (existingSessions.length > 0) {
-        console.log('Sessions already exist, skipping seeding');
+        logger.debug('Sessions already exist, skipping seeding');
         return;
       }
 
       const defaultSessions = this.createDefaultSessions();
       await storageService.saveSessions(defaultSessions);
 
-      console.log(`Seeded ${defaultSessions.length} default sessions`);
+      logger.debug(`Seeded ${defaultSessions.length} default sessions`);
     } catch (error) {
-      console.error('Failed to seed sessions:', error);
+      logger.error('Failed to seed sessions:', error);
       throw error;
     }
   }
@@ -123,16 +124,16 @@ export class DataSeedingService {
       const existingStereoSessions = await storageService.loadStereoSessions();
 
       if (existingStereoSessions.length > 0) {
-        console.log('Stereo sessions already exist, skipping seeding');
+        logger.debug('Stereo sessions already exist, skipping seeding');
         return;
       }
 
       const defaultStereoSessions = this.createDefaultStereoSessions();
       await storageService.saveStereoSessions(defaultStereoSessions);
 
-      console.log(`Seeded ${defaultStereoSessions.length} default stereo sessions`);
+      logger.debug(`Seeded ${defaultStereoSessions.length} default stereo sessions`);
     } catch (error) {
-      console.error('Failed to seed stereo sessions:', error);
+      logger.error('Failed to seed stereo sessions:', error);
       throw error;
     }
   }
@@ -145,14 +146,14 @@ export class DataSeedingService {
       const existingSettings = await storageService.loadSettings();
 
       if (existingSettings) {
-        console.log('Settings already exist, skipping seeding');
+        logger.debug('Settings already exist, skipping seeding');
         return;
       }
 
       await storageService.saveSettings(DEFAULT_APP_SETTINGS);
-      console.log('Seeded default app settings');
+      logger.debug('Seeded default app settings');
     } catch (error) {
-      console.error('Failed to seed settings:', error);
+      logger.error('Failed to seed settings:', error);
       throw error;
     }
   }
@@ -547,9 +548,9 @@ export class DataSeedingService {
     try {
       await storageService.clearAllData();
       this.isSeeded = false;
-      console.log('All data reset successfully');
+      logger.debug('All data reset successfully');
     } catch (error) {
-      console.error('Failed to reset data:', error);
+      logger.error('Failed to reset data:', error);
       throw new Error(`Data reset failed: ${error}`);
     }
   }
@@ -561,9 +562,9 @@ export class DataSeedingService {
     try {
       await this.resetAllData();
       await this.seedInitialData(); // Use the new initial data seeding with expanded statements
-      console.log('Data re-seeded successfully');
+      logger.debug('Data re-seeded successfully');
     } catch (error) {
-      console.error('Failed to re-seed data:', error);
+      logger.error('Failed to re-seed data:', error);
       throw new Error(`Data re-seeding failed: ${error}`);
     }
   }

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { useLanguage } from '../contexts/LanguageContext';
 import { StandardHeader } from '../components/StandardHeader';
 import { AudioPlayer, AudioPlayerRef } from '../components/AudioPlayer';
@@ -73,7 +74,7 @@ export const PlayerScreen: React.FC<PlayerScreenProps> = ({
     return () => {
       // Stop background music when component unmounts
       backgroundMusicService.stop().catch(error => {
-        console.log('Failed to stop background music on unmount:', error);
+        logger.debug('Failed to stop background music on unmount:', error);
       });
     };
   }, []);
@@ -93,7 +94,7 @@ export const PlayerScreen: React.FC<PlayerScreenProps> = ({
 
       setStatements(sessionStatements);
     } catch (error) {
-      console.error('Failed to load session statements:', error);
+      logger.error('Failed to load session statements:', error);
       Alert.alert(t('common.error'), t('player.loadFailed'));
     } finally {
       setIsLoading(false);
@@ -131,11 +132,11 @@ export const PlayerScreen: React.FC<PlayerScreenProps> = ({
   };
 
   const handleSessionStop = () => {
-    console.log('PlayerScreen: handleSessionStop called');
+    logger.debug('PlayerScreen: handleSessionStop called');
 
     // Prevent multiple simultaneous stop operations
     if (isStoppingRef.current) {
-      console.log('PlayerScreen: Stop already in progress, ignoring');
+      logger.debug('PlayerScreen: Stop already in progress, ignoring');
       return;
     }
 
@@ -146,11 +147,11 @@ export const PlayerScreen: React.FC<PlayerScreenProps> = ({
     const stopSession = async () => {
       try {
         // Stop the audio player first
-        console.log('PlayerScreen: Stopping audio player...');
+        logger.debug('PlayerScreen: Stopping audio player...');
         await audioPlayerRef.current?.stop();
-        console.log('PlayerScreen: Audio player stopped successfully');
+        logger.debug('PlayerScreen: Audio player stopped successfully');
       } catch (error) {
-        console.error('PlayerScreen: Error stopping audio player:', error);
+        logger.error('PlayerScreen: Error stopping audio player:', error);
       } finally {
         // Reset the stopping flag
         isStoppingRef.current = false;
@@ -199,7 +200,7 @@ export const PlayerScreen: React.FC<PlayerScreenProps> = ({
       // Stop the audio player first
       await audioPlayerRef.current?.stop();
     } catch (error) {
-      console.error('PlayerScreen: Error stopping audio player:', error);
+      logger.error('PlayerScreen: Error stopping audio player:', error);
     } finally {
       // Reset the stopping flag
       isStoppingRef.current = false;

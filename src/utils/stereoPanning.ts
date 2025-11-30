@@ -100,7 +100,7 @@ export async function createStereoAudio(
       rightBuffer,
     };
   } catch (error) {
-    console.error('Stereo panning failed:', error);
+    logger.error('Stereo panning failed:', error);
     throw new Error(
       `Stereo panning failed: ${error instanceof Error ? error.message : 'Unknown error'}`
     );

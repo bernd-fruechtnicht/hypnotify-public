@@ -10,6 +10,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { useLanguage } from '../contexts/LanguageContext';
 import { StatementCard } from '../components/StatementCard';
 import { StandardHeader } from '../components/StandardHeader';
@@ -63,7 +64,7 @@ export const LibraryScreen: React.FC<LibraryScreenProps> = ({
       const loadedStatements = await storageService.loadStatements();
       setStatements(loadedStatements);
     } catch (error) {
-      console.error('Failed to load statements:', error);
+      logger.error('Failed to load statements:', error);
       Alert.alert(t('common.error'), t('library.loadFailed'));
     } finally {
       setIsLoading(false);
@@ -174,7 +175,7 @@ export const LibraryScreen: React.FC<LibraryScreenProps> = ({
             await loadStatements();
             onStatementDelete?.(statement);
           } catch (error) {
-            console.error('Failed to delete statement:', error);
+            logger.error('Failed to delete statement:', error);
             Alert.alert(t('common.error'), t('library.deleteFailed'));
           }
         },

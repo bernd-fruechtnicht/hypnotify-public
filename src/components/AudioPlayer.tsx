@@ -14,6 +14,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
   ttsService,
@@ -126,7 +127,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
         // Return the actual delay used for the timeout
         return currentDelay;
       } catch (error) {
-        console.error('AudioPlayer: Failed to load delay setting:', error);
+        logger.error('AudioPlayer: Failed to load delay setting:', error);
         // Fallback to the passed delay
         setIsInDelay(true);
         setDelayCountdown(delaySeconds);
@@ -164,7 +165,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
             setStatementDelay(settings.tts.defaultPauseBetweenStatements);
           }
         } catch (error) {
-          console.error('AudioPlayer: Failed to load delay setting:', error);
+          logger.error('AudioPlayer: Failed to load delay setting:', error);
         }
       };
 
@@ -176,7 +177,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
       return () => {
         // Stop TTS when component unmounts
         ttsService.stop().catch(error => {
-          console.log('Failed to stop TTS on unmount:', error);
+          logger.debug('Failed to stop TTS on unmount:', error);
         });
       };
     }, []);
@@ -254,7 +255,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
             );
             await backgroundMusicService.play();
           } catch (error) {
-            console.warn(
+            logger.warn(
               'AudioPlayer: Failed to start background music:',
               error
             );
@@ -268,7 +269,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
         // Start playing without waiting for completion
         playCurrentStatement();
       } catch (error) {
-        console.error('Failed to start session:', error);
+        logger.error('Failed to start session:', error);
         setIsLoading(false);
       }
       // Don't set isLoading to false here - let playCurrentStatement handle it
@@ -343,7 +344,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
         );
         await ttsService.speak(statementText, ttsConfig);
       } catch (error) {
-        console.error('Failed to play statement:', error);
+        logger.error('Failed to play statement:', error);
         setIsLoading(false);
         // Clean up listener on error
         if (currentTTSListenerRef.current) {
@@ -370,7 +371,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
       try {
         await ttsService.stop();
       } catch (error) {
-        console.log('Stop error in handleStatementComplete (ignoring):', error);
+        logger.debug('Stop error in handleStatementComplete (ignoring):', error);
       }
 
       // Clean up listener
@@ -414,7 +415,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
         try {
           await backgroundMusicService.fadeOut(10); // 10 second fadeout
         } catch (error) {
-          console.warn(
+          logger.warn(
             'AudioPlayer: Failed to fade out background music on completion:',
             error
           );
@@ -463,7 +464,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
             try {
               await backgroundMusicService.pause();
             } catch (error) {
-              console.warn(
+              logger.warn(
                 'AudioPlayer: Failed to pause background music during countdown:',
                 error
               );
@@ -487,7 +488,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
           try {
             await backgroundMusicService.pause();
           } catch (error) {
-            console.warn(
+            logger.warn(
               'AudioPlayer: Failed to pause background music:',
               error
             );
@@ -508,7 +509,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
             try {
               await backgroundMusicService.resume();
             } catch (error) {
-              console.warn(
+              logger.warn(
                 'AudioPlayer: Failed to resume background music on countdown resume:',
                 error
               );
@@ -548,7 +549,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
           try {
             await backgroundMusicService.resume();
           } catch (error) {
-            console.warn(
+            logger.warn(
               'AudioPlayer: Failed to resume background music:',
               error
             );
@@ -559,7 +560,7 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
           await startSession();
         }
       } catch (error) {
-        console.error('Failed to control playback:', error);
+        logger.error('Failed to control playback:', error);
         // If pause/resume fails, fall back to stop/start
         if (isPlaying || isPaused) {
           await handleStop();
@@ -619,12 +620,12 @@ export const AudioPlayer = forwardRef<AudioPlayerRef, AudioPlayerProps>(
         try {
           await backgroundMusicService.stop();
         } catch (error) {
-          console.warn('AudioPlayer: Failed to stop background music:', error);
+          logger.warn('AudioPlayer: Failed to stop background music:', error);
         }
 
         // Don't call onSessionStop here - this is just a rewind/stop, not a session close
       } catch (error) {
-        console.error('AudioPlayer: Error stopping:', error);
+        logger.error('AudioPlayer: Error stopping:', error);
       }
     };
 

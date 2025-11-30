@@ -11,6 +11,7 @@ import { NativeTTSService } from './NativeTTSService';
 
 // Create TTS service instances
 const nativeTtsService = NativeTTSService.getInstance();
+import { logger } from '../utils/logger';
 import {
   TTSPlaybackConfig,
   TTSPlaybackState,
@@ -92,7 +93,7 @@ export class TTSService {
     }
 
     try {
-      console.log('TTS service initializing...');
+      logger.debug('TTS service initializing...');
       this.isInitialized = true;
       this.updateState({ status: TTSPlaybackStatus.IDLE });
     } catch (error) {
@@ -332,7 +333,7 @@ export class TTSService {
       try {
         listener(this.playbackState);
       } catch (error) {
-        console.error('Error in TTSService state change listener:', error);
+        logger.error('Error in TTSService state change listener:', error);
       }
     });
   }
@@ -471,7 +472,7 @@ export class TTSService {
       try {
         listener(error);
       } catch (listenerError) {
-        console.error('Error in error listener:', listenerError);
+        logger.error('Error in error listener:', listenerError);
       }
     });
   }

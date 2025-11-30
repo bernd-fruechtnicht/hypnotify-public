@@ -13,6 +13,7 @@ import {
   CloudTTSResult,
   AudioCacheEntry,
 } from '../types/StereoSession';
+import { logger } from '../utils/logger';
 
 // Define ApiError locally
 interface ApiError {
@@ -110,7 +111,7 @@ export class CloudTTSService {
     }
 
     try {
-      console.log('CloudTTSService: Initializing...');
+      logger.debug('CloudTTSService: Initializing...');
 
       if (config) {
         this.config = { ...this.config, ...config };
@@ -125,7 +126,7 @@ export class CloudTTSService {
       this.isInitialized = true;
       this.updateState({ isInitialized: true });
 
-      console.log('CloudTTSService: Initialized successfully');
+      logger.debug('CloudTTSService: Initialized successfully');
     } catch (error) {
       const apiError = this.createApiError(
         'INITIALIZATION_FAILED',
@@ -166,7 +167,7 @@ export class CloudTTSService {
     this.updateState({ isLoading: true, error: undefined });
 
     try {
-      console.log(
+      logger.debug(
         'CloudTTSService: Synthesizing text:',
         options.text.substring(0, 50) + '...'
       );
@@ -175,7 +176,7 @@ export class CloudTTSService {
       if (options.useCache !== false) {
         const cachedResult = this.getCachedAudio(options);
         if (cachedResult) {
-          console.log('CloudTTSService: Cache hit');
+          logger.debug('CloudTTSService: Cache hit');
           this.updateCacheStats(true);
           this.updatePerformanceMetrics(Date.now() - startTime, true);
           this.updateState({ isLoading: false });
@@ -183,7 +184,7 @@ export class CloudTTSService {
         }
       }
 
-      console.log('CloudTTSService: Cache miss, calling cloud API');
+      logger.debug('CloudTTSService: Cache miss, calling cloud API');
       this.updateCacheStats(false);
 
       // Call cloud TTS API
@@ -197,7 +198,7 @@ export class CloudTTSService {
       this.updatePerformanceMetrics(Date.now() - startTime, true);
       this.updateState({ isLoading: false });
 
-      console.log('CloudTTSService: Synthesis completed successfully');
+      logger.debug('CloudTTSService: Synthesis completed successfully');
       return result;
     } catch (error) {
       this.updatePerformanceMetrics(Date.now() - startTime, false);
@@ -247,7 +248,7 @@ export class CloudTTSService {
         hitRate: 0,
       },
     });
-    console.log('CloudTTSService: Cache cleared');
+    logger.debug('CloudTTSService: Cache cleared');
   }
 
   /**
@@ -296,7 +297,7 @@ export class CloudTTSService {
     this.stateChangeListeners = [];
     this.errorListeners = [];
     this.isInitialized = false;
-    console.log('CloudTTSService: Cleaned up');
+    logger.debug('CloudTTSService: Cleaned up');
   }
 
   // Private methods
@@ -310,24 +311,24 @@ export class CloudTTSService {
     const supabaseApiKey = process.env.EXPO_PUBLIC_SUPABASE_API_KEY || '';
 
     if (supabaseFunctionUrl) {
-      console.log(
+      logger.debug(
         'CloudTTSService: Using Supabase Edge Function URL from environment:',
         supabaseFunctionUrl
       );
     } else {
-      console.warn(
+      logger.warn(
         'CloudTTSService: EXPO_PUBLIC_SUPABASE_FUNCTION_URL not set. Cloud TTS will not be available.'
       );
     }
 
     if (supabaseApiKey) {
-      console.log(
+      logger.debug(
         'CloudTTSService: Supabase API Key is set (length:',
         supabaseApiKey.length,
         'characters)'
       );
     } else {
-      console.error(
+      logger.error(
         'CloudTTSService: EXPO_PUBLIC_SUPABASE_API_KEY is NOT set! This will cause 401 errors.'
       );
     }
@@ -373,14 +374,14 @@ export class CloudTTSService {
 
   private validateConfig(): void {
     if (!this.config.apiKey) {
-      console.warn(
+      logger.warn(
         'CloudTTSService: No API key configured. Cloud TTS will not be available. Using fallback audio files.'
       );
       return; // Don't throw error, just warn and continue
     }
 
     if (!this.config.endpoint) {
-      console.warn(
+      logger.warn(
         'CloudTTSService: No endpoint configured. Cloud TTS will not be available. Using fallback audio files.'
       );
       return; // Don't throw error, just warn and continue
@@ -411,23 +412,23 @@ export class CloudTTSService {
     // Add API key if available (for Supabase Edge Functions)
     if (this.config.apiKey) {
       headers['Authorization'] = `Bearer ${this.config.apiKey}`;
-      console.log(
+      logger.debug(
         'CloudTTSService: Authorization header set (API key length:',
         this.config.apiKey.length,
         'characters)'
       );
     } else {
-      console.error(
+      logger.error(
         'CloudTTSService: WARNING - No API key configured! Request will fail with 401.'
       );
     }
 
-    console.log(
+    logger.debug(
       'CloudTTSService: Calling Supabase Edge Function:',
       this.config.endpoint
     );
-    console.log('CloudTTSService: Request body:', requestBody);
-    console.log('CloudTTSService: Language being sent:', requestBody.language);
+    logger.debug('CloudTTSService: Request body:', requestBody);
+    logger.debug('CloudTTSService: Language being sent:', requestBody.language);
     // Headers are not logged for security reasons (contains API key)
 
     const response = await fetch(this.config.endpoint, {
@@ -585,7 +586,7 @@ export class CloudTTSService {
       try {
         listener(this.state);
       } catch (error) {
-        console.error('Error in CloudTTSService state change listener:', error);
+        logger.error('Error in CloudTTSService state change listener:', error);
       }
     });
   }
@@ -596,7 +597,7 @@ export class CloudTTSService {
       try {
         listener(error);
       } catch (listenerError) {
-        console.error(
+        logger.error(
           'Error in CloudTTSService error listener:',
           listenerError
         );
@@ -619,9 +620,9 @@ export class CloudTTSService {
   private async loadCacheFromStorage(): Promise<void> {
     try {
       // TODO: Implement cache loading from AsyncStorage
-      console.log('CloudTTSService: Cache loading not yet implemented');
+      logger.debug('CloudTTSService: Cache loading not yet implemented');
     } catch (error) {
-      console.warn(
+      logger.warn(
         'CloudTTSService: Failed to load cache from storage:',
         error
       );
@@ -631,9 +632,9 @@ export class CloudTTSService {
   private async saveCacheToStorage(): Promise<void> {
     try {
       // TODO: Implement cache saving to AsyncStorage
-      console.log('CloudTTSService: Cache saving not yet implemented');
+      logger.debug('CloudTTSService: Cache saving not yet implemented');
     } catch (error) {
-      console.warn('CloudTTSService: Failed to save cache to storage:', error);
+      logger.warn('CloudTTSService: Failed to save cache to storage:', error);
     }
   }
 

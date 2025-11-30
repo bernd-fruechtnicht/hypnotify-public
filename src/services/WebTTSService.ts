@@ -13,6 +13,7 @@ import {
   TTSErrorType,
 } from '../types/TTSConfig';
 import { filterVoicesByLanguage } from '../utils/voiceUtils';
+import { logger } from '../utils/logger';
 
 export class WebTTSService {
   private static instance: WebTTSService;
@@ -48,13 +49,13 @@ export class WebTTSService {
     }
 
     try {
-      console.log('WebTTSService: Initializing...');
-      console.log('Platform.OS:', Platform.OS);
+      logger.debug('WebTTSService: Initializing...');
+      logger.debug('Platform.OS:', Platform.OS);
 
       if (Platform.OS === 'web') {
-        console.log('WebTTSService: Web platform detected');
+        logger.debug('WebTTSService: Web platform detected');
         this.speechSynthesis = window.speechSynthesis;
-        console.log(
+        logger.debug(
           'WebTTSService: speechSynthesis available:',
           !!this.speechSynthesis
         );
@@ -68,7 +69,7 @@ export class WebTTSService {
 
         // Check if we need to wait for voices to load
         if (this.speechSynthesis.getVoices().length === 0) {
-          console.log(
+          logger.debug(
             'WebTTSService: No voices available, waiting for voices to load...'
           );
           return new Promise((resolve, reject) => {
@@ -80,13 +81,13 @@ export class WebTTSService {
               'voiceschanged',
               () => {
                 clearTimeout(timeout);
-                console.log(
+                logger.debug(
                   'WebTTSService: Voices loaded:',
                   this.speechSynthesis?.getVoices().length
                 );
                 this.isInitialized = true;
                 this.updateState({ status: TTSPlaybackStatus.IDLE });
-                console.log('WebTTSService: Initialization complete');
+                logger.debug('WebTTSService: Initialization complete');
                 resolve();
               },
               { once: true }
@@ -94,15 +95,15 @@ export class WebTTSService {
           });
         }
       } else {
-        console.log('WebTTSService: Not web platform, skipping initialization');
+        logger.debug('WebTTSService: Not web platform, skipping initialization');
         return;
       }
 
       this.isInitialized = true;
       this.updateState({ status: TTSPlaybackStatus.IDLE });
-      console.log('WebTTSService: Initialization complete');
+      logger.debug('WebTTSService: Initialization complete');
     } catch (error) {
-      console.error('WebTTSService: Initialization failed:', error);
+      logger.error('WebTTSService: Initialization failed:', error);
       const ttsError = this.createError(
         TTSErrorType.ENGINE_NOT_AVAILABLE,
         `Failed to initialize Web TTS service: ${error}`
@@ -135,7 +136,7 @@ export class WebTTSService {
         try {
           appSettings = await storageService.loadSettings();
         } catch (error) {
-          console.log('WebTTSService: Failed to load app settings:', error);
+          logger.debug('WebTTSService: Failed to load app settings:', error);
           // Use defaults if settings can't be loaded
         }
 
@@ -167,7 +168,7 @@ export class WebTTSService {
 
             if (targetVoices.length > 0) {
               selectedVoice = targetVoices[0].name;
-              console.log(
+              logger.debug(
                 'WebTTSService: Auto-selected voice for language:',
                 selectedVoice
               );
@@ -200,21 +201,21 @@ export class WebTTSService {
 
               if (fallbackVoices.length > 0) {
                 selectedVoice = fallbackVoices[0].name;
-                console.log(
+                logger.debug(
                   'WebTTSService: Auto-selected fallback voice:',
                   selectedVoice
                 );
               } else {
                 // No language-specific voices available - use the first available voice
                 selectedVoice = availableVoices[0].name;
-                console.log(
+                logger.debug(
                   'WebTTSService: Auto-selected first available voice:',
                   selectedVoice
                 );
               }
             }
           } else {
-            console.log(
+            logger.debug(
               'WebTTSService: Using voice from settings:',
               selectedVoice
             );
@@ -258,11 +259,11 @@ export class WebTTSService {
           try {
             if (fullConfig.voice && fullConfig.voice !== 'default') {
               const voices = this.speechSynthesis.getVoices();
-              console.log(
+              logger.debug(
                 'WebTTSService: Looking for voice:',
                 fullConfig.voice
               );
-              console.log(
+              logger.debug(
                 'WebTTSService: Available voices:',
                 voices.map(v => v.name)
               );
@@ -297,13 +298,13 @@ export class WebTTSService {
               }
 
               if (selectedVoice) {
-                console.log(
+                logger.debug(
                   'WebTTSService: Found matching voice:',
                   selectedVoice.name
                 );
                 utterance.voice = selectedVoice;
               } else {
-                console.log(
+                logger.debug(
                   'WebTTSService: No matching voice found, using fallback'
                 );
                 // Try to find any voice for the target language as fallback
@@ -313,7 +314,7 @@ export class WebTTSService {
                     voice.lang.includes(targetLanguage)
                 );
                 if (languageVoice) {
-                  console.log(
+                  logger.debug(
                     'WebTTSService: Using language fallback voice:',
                     languageVoice.name
                   );
@@ -327,7 +328,7 @@ export class WebTTSService {
                       voice.name.toLowerCase().includes('english')
                   );
                   if (englishVoice) {
-                    console.log(
+                    logger.debug(
                       'WebTTSService: Using English fallback voice:',
                       englishVoice.name
                     );
@@ -415,13 +416,13 @@ export class WebTTSService {
           this.stoppedUtterances.clear();
 
           // Start speech using the proven pattern
-          console.log('WebTTSService: Starting speech synthesis');
+          logger.debug('WebTTSService: Starting speech synthesis');
           try {
             this.speechSynthesis.speak(utterance);
-            console.log('WebTTSService: Speech synthesis started successfully');
+            logger.debug('WebTTSService: Speech synthesis started successfully');
             // Don't update state here - let onstart event handle it
           } catch (error) {
-            console.error(
+            logger.error(
               'WebTTSService: Error starting speech synthesis:',
               error
             );
@@ -434,21 +435,21 @@ export class WebTTSService {
             return;
           }
 
-          console.log('WebTTSService: Speech synthesis started');
+          logger.debug('WebTTSService: Speech synthesis started');
 
           // Check if it's actually speaking after a short delay
           setTimeout(() => {
-            console.log(
+            logger.debug(
               'WebTTSService: After 100ms - speaking:',
               this.speechSynthesis?.speaking
             );
-            console.log(
+            logger.debug(
               'WebTTSService: After 100ms - pending:',
               this.speechSynthesis?.pending
             );
           }, 100);
         } catch (error) {
-          console.error('WebTTSService: Speech synthesis failed:', error);
+          logger.error('WebTTSService: Speech synthesis failed:', error);
           const ttsError = this.createError(
             TTSErrorType.AUDIO_PLAYBACK_ERROR,
             `Failed to speak text: ${error}`
@@ -467,14 +468,14 @@ export class WebTTSService {
    */
   public async pause(): Promise<void> {
     if (Platform.OS === 'web' && this.speechSynthesis) {
-      console.log('WebTTSService: Pausing speech synthesis');
+      logger.debug('WebTTSService: Pausing speech synthesis');
       this.speechSynthesis.pause();
       this.updateState({
         status: TTSPlaybackStatus.PAUSED,
         isPlaying: false,
         isPaused: true,
       });
-      console.log('WebTTSService: Speech synthesis paused');
+      logger.debug('WebTTSService: Speech synthesis paused');
     }
   }
 
@@ -483,14 +484,14 @@ export class WebTTSService {
    */
   public async resume(): Promise<void> {
     if (Platform.OS === 'web' && this.speechSynthesis) {
-      console.log('WebTTSService: Resuming speech synthesis');
+      logger.debug('WebTTSService: Resuming speech synthesis');
       this.speechSynthesis.resume();
       this.updateState({
         status: TTSPlaybackStatus.PLAYING,
         isPlaying: true,
         isPaused: false,
       });
-      console.log('WebTTSService: Speech synthesis resumed');
+      logger.debug('WebTTSService: Speech synthesis resumed');
     }
   }
 
@@ -609,7 +610,7 @@ export class WebTTSService {
       return;
     }
 
-    console.log('WebTTSService: Forcing voice refresh...');
+    logger.debug('WebTTSService: Forcing voice refresh...');
 
     try {
       // Create multiple dummy utterances to force voice loading
@@ -624,16 +625,16 @@ export class WebTTSService {
       await new Promise(resolve => setTimeout(resolve, 200));
 
       const voices = this.speechSynthesis.getVoices();
-      console.log('WebTTSService: Voices after refresh:', voices.length);
+      logger.debug('WebTTSService: Voices after refresh:', voices.length);
 
       // Log all voices for debugging
       voices.forEach((voice, index) => {
-        console.log(
+        logger.debug(
           `${index + 1}. ${voice.name} (${voice.lang}) - ${voice.localService ? 'Local' : 'Remote'}`
         );
       });
     } catch (error) {
-      console.error('WebTTSService: Failed to refresh voices:', error);
+      logger.error('WebTTSService: Failed to refresh voices:', error);
     }
   }
 
@@ -652,7 +653,7 @@ export class WebTTSService {
       window.speechSynthesis.speak(testUtterance);
       return true;
     } catch (error) {
-      console.error('WebTTSService: Speech synthesis test failed:', error);
+      logger.error('WebTTSService: Speech synthesis test failed:', error);
       return false;
     }
   }
@@ -717,7 +718,7 @@ export class WebTTSService {
    * Manually trigger user interaction (for testing)
    */
   public triggerUserInteraction(): void {
-    console.log('WebTTSService: Manually triggering user interaction');
+    logger.debug('WebTTSService: Manually triggering user interaction');
     this.userInteracted = true;
 
     // Resolve the interaction promise if it exists
@@ -777,7 +778,7 @@ export class WebTTSService {
       try {
         listener(this.playbackState);
       } catch (error) {
-        console.error('Error in state change listener:', error);
+        logger.error('Error in state change listener:', error);
       }
     });
   }
@@ -795,7 +796,7 @@ export class WebTTSService {
       try {
         listener(error);
       } catch (listenerError) {
-        console.error('Error in error listener:', listenerError);
+        logger.error('Error in error listener:', listenerError);
       }
     });
   }
@@ -815,7 +816,7 @@ export class WebTTSService {
     // Create a promise that resolves when user interacts
     this.interactionPromise = new Promise<void>(resolve => {
       const handleUserInteraction = () => {
-        console.log('WebTTSService: User interaction detected');
+        logger.debug('WebTTSService: User interaction detected');
         this.userInteracted = true;
         resolve();
 

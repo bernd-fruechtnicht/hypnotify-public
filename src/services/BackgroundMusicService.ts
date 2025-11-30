@@ -7,6 +7,7 @@
 import { storageService } from './StorageService';
 import { IAudioHandler } from './audio/IAudioHandler';
 import { AudioHandlerFactory } from './audio/AudioHandlerFactory';
+import { logger } from '../utils/logger';
 
 export class BackgroundMusicService {
   private static instance: BackgroundMusicService;
@@ -30,15 +31,15 @@ export class BackgroundMusicService {
       // Small delay to let app startup complete
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      console.log(
+      logger.debug(
         'BackgroundMusicService: Starting background initialization...'
       );
       await this.initialize();
-      console.log(
+      logger.debug(
         'BackgroundMusicService: Background initialization completed'
       );
     } catch (error) {
-      console.warn(
+      logger.warn(
         'BackgroundMusicService: Background initialization failed:',
         error
       );
@@ -79,13 +80,13 @@ export class BackgroundMusicService {
         await this.audioHandler.setVolume(this.volume);
 
         this.isInitialized = true;
-        console.log('BackgroundMusicService: Initialized successfully');
+        logger.debug('BackgroundMusicService: Initialized successfully');
       } catch (fileError) {
-        console.warn(
+        logger.warn(
           'BackgroundMusicService: Audio file not found or invalid:',
           fileError
         );
-        console.log(
+        logger.debug(
           'BackgroundMusicService: Please place a valid audio file at assets/audio/background-music/breath-of-life_5-minutes-320858.mp3'
         );
         this.isInitialized = false;
@@ -93,7 +94,7 @@ export class BackgroundMusicService {
         return;
       }
     } catch (error) {
-      console.error('BackgroundMusicService: Failed to initialize:', error);
+      logger.error('BackgroundMusicService: Failed to initialize:', error);
       this.isInitialized = false;
       // Don't throw error - just mark as not available
     }
@@ -123,7 +124,7 @@ export class BackgroundMusicService {
   public async play(): Promise<void> {
     const initialized = await this.ensureInitialized();
     if (!initialized) {
-      console.warn(
+      logger.warn(
         'BackgroundMusicService: Cannot play - service not initialized'
       );
       return;
@@ -132,7 +133,7 @@ export class BackgroundMusicService {
     try {
       await this.audioHandler.play();
     } catch (error) {
-      console.error(
+      logger.error(
         'BackgroundMusicService: Failed to play background music:',
         error
       );
@@ -146,7 +147,7 @@ export class BackgroundMusicService {
     try {
       await this.audioHandler.pause();
     } catch (error) {
-      console.error(
+      logger.error(
         'BackgroundMusicService: Failed to pause background music:',
         error
       );
@@ -160,7 +161,7 @@ export class BackgroundMusicService {
     try {
       await this.audioHandler.resume();
     } catch (error) {
-      console.error(
+      logger.error(
         'BackgroundMusicService: Failed to resume background music:',
         error
       );
@@ -174,7 +175,7 @@ export class BackgroundMusicService {
     try {
       await this.audioHandler.stop();
     } catch (error) {
-      console.error(
+      logger.error(
         'BackgroundMusicService: Failed to stop background music:',
         error
       );
@@ -188,7 +189,7 @@ export class BackgroundMusicService {
     try {
       await this.audioHandler.fadeOut(durationSeconds);
     } catch (error) {
-      console.error(
+      logger.error(
         'BackgroundMusicService: Failed to fade out background music:',
         error
       );
@@ -213,7 +214,7 @@ export class BackgroundMusicService {
     try {
       await this.audioHandler.setVolume(this.volume);
     } catch (error) {
-      console.error('BackgroundMusicService: Failed to set volume:', error);
+      logger.error('BackgroundMusicService: Failed to set volume:', error);
     }
   }
 
@@ -239,7 +240,7 @@ export class BackgroundMusicService {
 
     // If we think we're initialized but audio handler is not available, try to reinitialize
     if (initialized && !this.audioHandler.isAvailable()) {
-      console.log(
+      logger.debug(
         'BackgroundMusicService: Audio handler became unavailable, attempting reinitialization...'
       );
       this.isInitialized = false;
@@ -264,9 +265,9 @@ export class BackgroundMusicService {
     try {
       await this.audioHandler.cleanup();
       this.isInitialized = false;
-      console.log('BackgroundMusicService: Cleaned up resources');
+      logger.debug('BackgroundMusicService: Cleaned up resources');
     } catch (error) {
-      console.error('BackgroundMusicService: Failed to cleanup:', error);
+      logger.error('BackgroundMusicService: Failed to cleanup:', error);
     }
   }
 }

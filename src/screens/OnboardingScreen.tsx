@@ -9,6 +9,7 @@ import {
   // Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { useLanguage } from '../contexts/LanguageContext';
 import {
@@ -44,7 +45,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   useEffect(() => {
     return () => {
       stopAllAudio().catch(error => {
-        console.warn('OnboardingScreen: Error in cleanup:', error);
+        logger.warn('OnboardingScreen: Error in cleanup:', error);
       });
     };
   }, []);
@@ -120,13 +121,13 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
     try {
       // Stop background music
       await backgroundMusicService.stop();
-      console.log('OnboardingScreen: Stopped background music');
+      logger.debug('OnboardingScreen: Stopped background music');
 
       // Stop any ongoing TTS
       await ttsService.stop();
-      console.log('OnboardingScreen: Stopped TTS');
+      logger.debug('OnboardingScreen: Stopped TTS');
     } catch (error) {
-      console.warn('OnboardingScreen: Error stopping audio:', error);
+      logger.warn('OnboardingScreen: Error stopping audio:', error);
     }
   };
 
@@ -156,7 +157,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
 
       onComplete();
     } catch (error) {
-      console.error('Failed to complete onboarding:', error);
+      logger.error('Failed to complete onboarding:', error);
       // Still complete onboarding even if saving fails
       onComplete();
     }

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { useLanguage } from '../contexts/LanguageContext';
 import { StandardHeader } from '../components/StandardHeader';
 import { StatementSelector } from '../components/StatementSelector';
@@ -47,7 +48,7 @@ export const SessionEditScreen: React.FC<SessionEditScreenProps> = ({
   const [showStatementSelector, setShowStatementSelector] = useState(false);
   const [insertPosition, setInsertPosition] = useState<number | null>(null);
 
-  console.log(
+  logger.debug(
     'SessionEditScreen rendered with session:',
     session?.name || 'null'
   );
@@ -81,7 +82,7 @@ export const SessionEditScreen: React.FC<SessionEditScreenProps> = ({
       // Use all statements - they are now multi-language
       setStatements(allStatements);
     } catch (error) {
-      console.error('Failed to load statements:', error);
+      logger.error('Failed to load statements:', error);
       Alert.alert(t('common.error'), t('sessionEdit.loadStatementsFailed'));
     } finally {
       setIsLoading(false);
@@ -204,13 +205,13 @@ export const SessionEditScreen: React.FC<SessionEditScreenProps> = ({
   const getSessionStatements = (): MeditationStatement[] => {
     if (!editedSession) return [];
 
-    console.log('SessionEditScreen: Getting session statements');
-    console.log(
+    logger.debug('SessionEditScreen: Getting session statements');
+    logger.debug(
       'SessionEditScreen: editedSession.statementIds:',
       editedSession.statementIds
     );
-    console.log('SessionEditScreen: statements.length:', statements.length);
-    console.log(
+    logger.debug('SessionEditScreen: statements.length:', statements.length);
+    logger.debug(
       'SessionEditScreen: statements IDs:',
       statements.map(s => s.id)
     );
@@ -218,7 +219,7 @@ export const SessionEditScreen: React.FC<SessionEditScreenProps> = ({
     const sessionStatements = editedSession.statementIds
       .map(id => {
         const found = statements.find(stmt => stmt.id === id);
-        console.log(
+        logger.debug(
           `SessionEditScreen: Looking for ID ${id}, found:`,
           found ? 'YES' : 'NO'
         );
@@ -226,7 +227,7 @@ export const SessionEditScreen: React.FC<SessionEditScreenProps> = ({
       })
       .filter((stmt): stmt is MeditationStatement => stmt !== undefined);
 
-    console.log(
+    logger.debug(
       'SessionEditScreen: Final session statements:',
       sessionStatements.length
     );

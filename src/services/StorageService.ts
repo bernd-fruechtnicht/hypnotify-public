@@ -4,6 +4,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '../utils/logger';
 import {
   MeditationStatement,
   MeditationSession,
@@ -58,7 +59,7 @@ export class StorageService {
 
       this.isInitialized = true;
     } catch (error) {
-      console.error('Failed to initialize StorageService:', error);
+      logger.error('Failed to initialize StorageService:', error);
       throw new Error(`Storage service initialization failed: ${error}`);
     }
   }
@@ -80,7 +81,7 @@ export class StorageService {
       const serialized = await this.serialize(storageItem);
       await AsyncStorage.setItem(this.KEYS.STATEMENTS, serialized);
     } catch (error) {
-      console.error('Failed to save statements:', error);
+      logger.error('Failed to save statements:', error);
       throw new Error(`Failed to save statements: ${error}`);
     }
   }
@@ -100,7 +101,7 @@ export class StorageService {
         await this.deserialize<MeditationStatement[]>(serialized);
       return storageItem.value;
     } catch (error) {
-      console.error('Failed to load statements:', error);
+      logger.error('Failed to load statements:', error);
       return [];
     }
   }
@@ -120,7 +121,7 @@ export class StorageService {
       const serialized = await this.serialize(storageItem);
       await AsyncStorage.setItem(this.KEYS.SESSIONS, serialized);
     } catch (error) {
-      console.error('Failed to save sessions:', error);
+      logger.error('Failed to save sessions:', error);
       throw new Error(`Failed to save sessions: ${error}`);
     }
   }
@@ -140,7 +141,7 @@ export class StorageService {
         await this.deserialize<MeditationSession[]>(serialized);
       return storageItem.value;
     } catch (error) {
-      console.error('Failed to load sessions:', error);
+      logger.error('Failed to load sessions:', error);
       return [];
     }
   }
@@ -160,7 +161,7 @@ export class StorageService {
       const serialized = await this.serialize(storageItem);
       await AsyncStorage.setItem(this.KEYS.SETTINGS, serialized);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      logger.error('Failed to save settings:', error);
       throw new Error(`Failed to save settings: ${error}`);
     }
   }
@@ -173,18 +174,18 @@ export class StorageService {
     try {
       const serialized = await AsyncStorage.getItem(this.KEYS.SETTINGS);
       if (!serialized) {
-        console.log('StorageService: No settings found, returning null');
+        logger.debug('StorageService: No settings found, returning null');
         return null;
       }
 
       const storageItem = await this.deserialize<AppSettings>(serialized);
       const settings = storageItem.value;
 
-      console.log('StorageService: Raw loaded settings:', settings);
+      logger.debug('StorageService: Raw loaded settings:', settings);
 
       // Migrate old settings to include voicesPerLanguage if missing
       if (settings && settings.tts && !settings.tts.voicesPerLanguage) {
-        console.log(
+        logger.debug(
           'StorageService: Migrating old settings to include voicesPerLanguage'
         );
         settings.tts.voicesPerLanguage = {
@@ -192,15 +193,15 @@ export class StorageService {
           de: settings.tts.defaultVoice || 'default',
           zh: settings.tts.defaultVoice || 'default',
         };
-        console.log(
+        logger.debug(
           'StorageService: Migrated voicesPerLanguage:',
           settings.tts.voicesPerLanguage
         );
         // Save the migrated settings
         await this.saveSettings(settings);
-        console.log('StorageService: Migrated settings saved');
+        logger.debug('StorageService: Migrated settings saved');
       } else if (settings && settings.tts && settings.tts.voicesPerLanguage) {
-        console.log(
+        logger.debug(
           'StorageService: voicesPerLanguage already exists:',
           settings.tts.voicesPerLanguage
         );
@@ -213,19 +214,19 @@ export class StorageService {
         settings.tts.defaultVoice &&
         settings.tts.defaultVoice !== 'default'
       ) {
-        console.log(
+        logger.debug(
           'StorageService: Clearing old defaultVoice:',
           settings.tts.defaultVoice
         );
         settings.tts.defaultVoice = 'default';
         await this.saveSettings(settings);
-        console.log('StorageService: Cleared defaultVoice and saved settings');
+        logger.debug('StorageService: Cleared defaultVoice and saved settings');
       }
 
-      console.log('StorageService: Final settings being returned:', settings);
+      logger.debug('StorageService: Final settings being returned:', settings);
       return settings;
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      logger.error('Failed to load settings:', error);
       return null;
     }
   }
@@ -306,7 +307,7 @@ export class StorageService {
         keys: [...keys],
       };
     } catch (error) {
-      console.error('Failed to get storage info:', error);
+      logger.error('Failed to get storage info:', error);
       return { totalKeys: 0, estimatedSize: 0, keys: [] };
     }
   }
@@ -322,7 +323,7 @@ export class StorageService {
       const key = this.KEYS[type.toUpperCase() as keyof typeof this.KEYS];
       await AsyncStorage.removeItem(key);
     } catch (error) {
-      console.error(`Failed to clear ${type} data:`, error);
+      logger.error(`Failed to clear ${type} data:`, error);
       throw new Error(`Failed to clear ${type} data: ${error}`);
     }
   }
@@ -351,7 +352,7 @@ export class StorageService {
         exportDate: new Date(),
       };
     } catch (error) {
-      console.error('Failed to export data:', error);
+      logger.error('Failed to export data:', error);
       throw new Error(`Failed to export data: ${error}`);
     }
   }
@@ -382,7 +383,7 @@ export class StorageService {
 
       await Promise.all(promises);
     } catch (error) {
-      console.error('Failed to import data:', error);
+      logger.error('Failed to import data:', error);
       throw new Error(`Failed to import data: ${error}`);
     }
   }
@@ -415,7 +416,7 @@ export class StorageService {
         await this.saveSessions(filteredSessions);
       }
     } catch (error) {
-      console.error('Failed to cleanup old data:', error);
+      logger.error('Failed to cleanup old data:', error);
       throw new Error(`Failed to cleanup old data: ${error}`);
     }
   }
@@ -503,7 +504,7 @@ export class StorageService {
       }
       return [];
     } catch (error) {
-      console.error('StorageService: Failed to load stereo sessions:', error);
+      logger.error('StorageService: Failed to load stereo sessions:', error);
       return [];
     }
   }
@@ -518,7 +519,7 @@ export class StorageService {
         JSON.stringify(sessions)
       );
     } catch (error) {
-      console.error('StorageService: Failed to save stereo sessions:', error);
+      logger.error('StorageService: Failed to save stereo sessions:', error);
       throw error;
     }
   }
@@ -537,7 +538,7 @@ export class StorageService {
         AsyncStorage.removeItem(this.KEYS.CACHE),
       ]);
     } catch (error) {
-      console.error('StorageService: Failed to clear all data:', error);
+      logger.error('StorageService: Failed to clear all data:', error);
       throw error;
     }
   }

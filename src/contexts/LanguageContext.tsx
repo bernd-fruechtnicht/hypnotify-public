@@ -51,12 +51,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
         }
 
         setIsInitialized(true);
-        console.log(
+        logger.debug(
           'LanguageContext: Initialized with language:',
           currentLanguage
         );
       } catch (error) {
-        console.error('LanguageContext: Failed to initialize:', error);
+        logger.error('LanguageContext: Failed to initialize:', error);
         setIsInitialized(true);
       }
     };
@@ -66,7 +66,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
   const changeLanguage = async (languageCode: string) => {
     try {
-      console.log('LanguageContext: Changing language to:', languageCode);
+      logger.debug('LanguageContext: Changing language to:', languageCode);
 
       // Load the language resources first
       await i18n.loadLanguages([languageCode]);
@@ -82,12 +82,12 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
       const deviceLanguage = deviceLocales[0]?.languageCode || 'en';
       setIsDeviceLanguage(languageCode === deviceLanguage);
 
-      console.log(
+      logger.debug(
         'LanguageContext: Language changed successfully to:',
         languageCode
       );
     } catch (error) {
-      console.error('LanguageContext: Failed to change language:', error);
+      logger.error('LanguageContext: Failed to change language:', error);
     }
   };
 

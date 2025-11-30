@@ -14,77 +14,77 @@ export class IOSWebAudioHandler extends WebAudioHandler {
     this.isIOSWeb = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
     if (!this.isIOSWeb) {
-      console.log(
+      logger.debug(
         'IOSWebAudioHandler: Not iOS web browser, skipping initialization'
       );
       return;
     }
 
-    console.log('IOSWebAudioHandler: Initializing for iOS web browser');
+    logger.debug('IOSWebAudioHandler: Initializing for iOS web browser');
     await super.initialize();
   }
 
   async loadAudio(source: any): Promise<void> {
     if (!this.isIOSWeb) {
-      console.log(
+      logger.debug(
         'IOSWebAudioHandler: Not iOS web browser, skipping audio load'
       );
       return;
     }
 
-    console.log('IOSWebAudioHandler: Loading audio for iOS web browser');
+    logger.debug('IOSWebAudioHandler: Loading audio for iOS web browser');
     await super.loadAudio(source);
   }
 
   async play(): Promise<void> {
     if (!this.isIOSWeb) {
-      console.log('IOSWebAudioHandler: Not iOS web browser, skipping play');
+      logger.debug('IOSWebAudioHandler: Not iOS web browser, skipping play');
       return;
     }
 
-    console.log('IOSWebAudioHandler: Playing audio on iOS web browser');
+    logger.debug('IOSWebAudioHandler: Playing audio on iOS web browser');
     await super.play();
   }
 
   async pause(): Promise<void> {
     if (!this.isIOSWeb) {
-      console.log('IOSWebAudioHandler: Not iOS web browser, skipping pause');
+      logger.debug('IOSWebAudioHandler: Not iOS web browser, skipping pause');
       return;
     }
 
-    console.log('IOSWebAudioHandler: Pausing audio on iOS web browser');
+    logger.debug('IOSWebAudioHandler: Pausing audio on iOS web browser');
     await super.pause();
   }
 
   async resume(): Promise<void> {
     if (!this.isIOSWeb) {
-      console.log('IOSWebAudioHandler: Not iOS web browser, skipping resume');
+      logger.debug('IOSWebAudioHandler: Not iOS web browser, skipping resume');
       return;
     }
 
-    console.log('IOSWebAudioHandler: Resuming audio on iOS web browser');
+    logger.debug('IOSWebAudioHandler: Resuming audio on iOS web browser');
     await super.resume();
   }
 
   async stop(): Promise<void> {
     if (!this.isIOSWeb) {
-      console.log('IOSWebAudioHandler: Not iOS web browser, skipping stop');
+      logger.debug('IOSWebAudioHandler: Not iOS web browser, skipping stop');
       return;
     }
 
-    console.log('IOSWebAudioHandler: Stopping audio on iOS web browser');
+    logger.debug('IOSWebAudioHandler: Stopping audio on iOS web browser');
     await super.stop();
   }
 
   async setVolume(volume: number): Promise<void> {
     if (!this.isIOSWeb) {
-      console.log(
+      logger.debug(
         'IOSWebAudioHandler: Not iOS web browser, skipping volume set'
       );
       return;
     }
 
-    console.log(
+    logger.debug(
       'IOSWebAudioHandler: Setting volume on iOS web browser to',
       volume
     );
@@ -93,11 +93,11 @@ export class IOSWebAudioHandler extends WebAudioHandler {
 
   async fadeOut(durationSeconds: number = 10): Promise<void> {
     if (!this.isIOSWeb) {
-      console.log('IOSWebAudioHandler: Not iOS web browser, skipping fadeout');
+      logger.debug('IOSWebAudioHandler: Not iOS web browser, skipping fadeout');
       return;
     }
 
-    console.log('IOSWebAudioHandler: Fading out audio on iOS web browser');
+    logger.debug('IOSWebAudioHandler: Fading out audio on iOS web browser');
     await super.fadeOut(durationSeconds);
   }
 

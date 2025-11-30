@@ -21,6 +21,7 @@ import {
   dataSeedingService,
 } from '../services';
 import { AppSettings, DEFAULT_APP_SETTINGS } from '../types';
+import { logger } from '../utils/logger';
 
 interface SettingsScreenProps {
   onBack?: () => void;
@@ -49,9 +50,9 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   const loadSettings = async () => {
     try {
       setIsLoading(true);
-      console.log('SettingsScreen: Platform.OS:', Platform.OS);
+      logger.debug('SettingsScreen: Platform.OS:', Platform.OS);
       const loadedSettings = await storageService.loadSettings();
-      console.log('SettingsScreen: Loaded settings:', loadedSettings);
+      logger.debug('SettingsScreen: Loaded settings:', loadedSettings);
       if (loadedSettings) {
         // Ensure volume is set correctly for Android (fixed at 1.0)
         if (
@@ -60,20 +61,20 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         ) {
           loadedSettings.tts.defaultVolume = 1.0;
           await storageService.saveSettings(loadedSettings);
-          console.log('SettingsScreen: Set volume to 1.0 for Android');
+          logger.debug('SettingsScreen: Set volume to 1.0 for Android');
         }
         setSettings(loadedSettings);
-        console.log(
+        logger.debug(
           'SettingsScreen: Current voicesPerLanguage:',
           loadedSettings.tts?.voicesPerLanguage
         );
-        console.log('SettingsScreen: Current language:', currentLanguage);
-        console.log(
+        logger.debug('SettingsScreen: Current language:', currentLanguage);
+        logger.debug(
           'SettingsScreen: Voice for current language:',
           loadedSettings.tts?.voicesPerLanguage?.[currentLanguage]
         );
       } else {
-        console.log('SettingsScreen: No settings loaded, using defaults');
+        logger.debug('SettingsScreen: No settings loaded, using defaults');
         const defaultSettings = { ...DEFAULT_APP_SETTINGS };
         // Set volume for Android (fixed at 1.0)
         if (Platform.OS === 'android') {
@@ -82,7 +83,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         setSettings(defaultSettings);
       }
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      logger.error('Failed to load settings:', error);
     } finally {
       setIsLoading(false);
     }
@@ -92,14 +93,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     try {
       const voices = await ttsService.getAvailableVoices(currentLanguage);
       setAvailableVoices(voices);
-      console.log(
+      logger.debug(
         'SettingsScreen: Loaded voices for',
         currentLanguage,
         ':',
         voices.length
       );
     } catch (error) {
-      console.error('Failed to load voices:', error);
+      logger.error('Failed to load voices:', error);
       setAvailableVoices([]);
     }
   };
@@ -108,9 +109,9 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     try {
       const isAvailable = backgroundMusicService.isBackgroundMusicAvailable();
       setIsBackgroundMusicAvailable(isAvailable);
-      console.log('SettingsScreen: Background music available:', isAvailable);
+      logger.debug('SettingsScreen: Background music available:', isAvailable);
     } catch (error) {
-      console.error('Failed to check background music availability:', error);
+      logger.error('Failed to check background music availability:', error);
       setIsBackgroundMusicAvailable(false);
     }
   };
@@ -146,7 +147,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       setSettings(newSettings);
       onSettingsChange?.(newSettings);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      logger.error('Failed to save settings:', error);
       Alert.alert(t('common.error'), t('settings.saveFailed'));
     }
   };
@@ -167,7 +168,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
       },
     };
 
-    console.log('SettingsScreen: New settings with voice:', {
+    logger.debug('SettingsScreen: New settings with voice:', {
       voicesPerLanguage: newSettings.tts.voicesPerLanguage,
       currentLanguage,
       voiceIdentifier,
@@ -253,7 +254,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             await storageService.clearAllData();
             Alert.alert(t('common.success'), t('settings.dataCleared'));
           } catch (error) {
-            console.error('Failed to clear data:', error);
+            logger.error('Failed to clear data:', error);
             Alert.alert(t('common.error'), t('settings.clearDataFailed'));
           }
         },
@@ -262,7 +263,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   };
 
   const handleReseedData = () => {
-    console.log('handleReseedData called');
+    logger.debug('handleReseedData called');
 
     const confirmMessage =
       'This will reset all data and create new multi-language sessions. Continue?';
@@ -271,11 +272,11 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
     const errorMessage = 'Failed to re-seed data. Please try again.';
 
     const performReseed = () => {
-      console.log('Re-seed button pressed, starting reseed...');
+      logger.debug('Re-seed button pressed, starting reseed...');
       dataSeedingService
         .reseedData()
         .then(() => {
-          console.log('Re-seed completed successfully');
+          logger.debug('Re-seed completed successfully');
           if (Platform.OS === 'web') {
             alert(successMessage);
           } else {
@@ -283,7 +284,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           }
         })
         .catch(error => {
-          console.error('Failed to re-seed data:', error);
+          logger.error('Failed to re-seed data:', error);
           if (Platform.OS === 'web') {
             alert(errorMessage);
           } else {

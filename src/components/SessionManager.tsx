@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { logger } from '../utils/logger';
 import { storageService } from '../services';
 import {
   MeditationSession,
@@ -66,7 +67,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
 
       setSessions(validSessions);
     } catch (error) {
-      console.error('Failed to load sessions:', error);
+      logger.error('Failed to load sessions:', error);
       Alert.alert(
         t('sessionManager.loadFailed'),
         t(
@@ -99,7 +100,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
           )
         );
       } catch (error) {
-        console.error('Failed to delete session:', error);
+        logger.error('Failed to delete session:', error);
         Alert.alert(
           t('sessionManager.deleteFailed'),
           t(
@@ -151,7 +152,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
         year: 'numeric',
       }).format(dateObj);
     } catch (error) {
-      console.error('Error formatting date:', error);
+      logger.error('Error formatting date:', error);
       return 'Unknown date';
     }
   };
@@ -220,7 +221,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
                       style={styles.editButton}
                       onPress={e => {
                         e.stopPropagation();
-                        console.log(
+                        logger.debug(
                           'Edit button clicked for session:',
                           session.name
                         );

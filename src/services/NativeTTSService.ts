@@ -14,6 +14,7 @@ import {
   TTSErrorType,
 } from '../types/TTSConfig';
 import { filterVoicesByLanguage } from '../utils/voiceUtils';
+import { logger } from '../utils/logger';
 
 export class NativeTTSService {
   private static instance: NativeTTSService;
@@ -67,14 +68,14 @@ export class NativeTTSService {
    */
   public isAvailable(): boolean {
     const available = Platform.OS === 'ios' || Platform.OS === 'android';
-    console.log(
+    logger.debug(
       `NativeTTSService: isAvailable() called - Platform: ${Platform.OS}, Available: ${available}`
     );
-    console.log(`NativeTTSService: Platform.OS type: ${typeof Platform.OS}`);
-    console.log(
+    logger.debug(`NativeTTSService: Platform.OS type: ${typeof Platform.OS}`);
+    logger.debug(
       `NativeTTSService: Platform.OS === 'android': ${Platform.OS === 'android'}`
     );
-    console.log(
+    logger.debug(
       `NativeTTSService: Platform.OS === 'ios': ${Platform.OS === 'ios'}`
     );
     return available;
@@ -154,7 +155,7 @@ export class NativeTTSService {
         const expoPitch = Math.max(0.0, Math.min(2.0, fullConfig.pitch));
         const expoVolume = Math.max(0.0, Math.min(1.0, fullConfig.volume));
 
-        console.log('NativeTTSService: TTS parameters:', {
+        logger.debug('NativeTTSService: TTS parameters:', {
           rate: expoRate,
           pitch: expoPitch,
           volume: expoVolume,
@@ -206,12 +207,12 @@ export class NativeTTSService {
           onError,
         };
 
-        console.log(
+        logger.debug(
           'NativeTTSService: Calling Speech.speak with options:',
           speechOptions
         );
-        console.log('NativeTTSService: Voice being used:', fullConfig.voice);
-        console.log(
+        logger.debug('NativeTTSService: Voice being used:', fullConfig.voice);
+        logger.debug(
           'NativeTTSService: Is voice different from default?',
           fullConfig.voice !== 'default'
         );
@@ -235,11 +236,11 @@ export class NativeTTSService {
    * Pause current speech
    */
   public async pause(): Promise<void> {
-    console.log('NativeTTSService: Pause called');
+    logger.debug('NativeTTSService: Pause called');
     if (this.isAvailable()) {
       if (Platform.OS === 'android') {
         // Android doesn't support pause - just stop and let AudioPlayer handle it
-        console.log(
+        logger.debug(
           'NativeTTSService: Android pause - stopping current speech (pause not supported)'
         );
         Speech.stop();
@@ -248,23 +249,23 @@ export class NativeTTSService {
           isPlaying: false,
           isPaused: false,
         });
-        console.log(
+        logger.debug(
           'NativeTTSService: Android pause - state updated to STOPPED'
         );
       } else {
         // iOS - use native pause
-        console.log('NativeTTSService: iOS pause - calling Speech.pause()');
+        logger.debug('NativeTTSService: iOS pause - calling Speech.pause()');
         try {
           Speech.pause();
-          console.log('NativeTTSService: Speech.pause() called successfully');
+          logger.debug('NativeTTSService: Speech.pause() called successfully');
           this.updateState({
             status: TTSPlaybackStatus.PAUSED,
             isPlaying: false,
             isPaused: true,
           });
-          console.log('NativeTTSService: State updated to PAUSED');
+          logger.debug('NativeTTSService: State updated to PAUSED');
         } catch (error) {
-          console.error(
+          logger.error(
             'NativeTTSService: Error calling Speech.pause():',
             error
           );
@@ -272,7 +273,7 @@ export class NativeTTSService {
         }
       }
     } else {
-      console.log('NativeTTSService: Platform not available for pause');
+      logger.debug('NativeTTSService: Platform not available for pause');
     }
   }
 
@@ -280,28 +281,28 @@ export class NativeTTSService {
    * Resume paused speech
    */
   public async resume(): Promise<void> {
-    console.log('NativeTTSService: Resume called');
+    logger.debug('NativeTTSService: Resume called');
     if (this.isAvailable()) {
       if (Platform.OS === 'android') {
         // Android doesn't support resume - this should not be called
-        console.log(
+        logger.debug(
           'NativeTTSService: Android resume - not supported, doing nothing'
         );
         // Don't change state - let AudioPlayer handle restarting the statement
       } else {
         // iOS - use native resume
-        console.log('NativeTTSService: iOS resume - calling Speech.resume()');
+        logger.debug('NativeTTSService: iOS resume - calling Speech.resume()');
         try {
           Speech.resume();
-          console.log('NativeTTSService: Speech.resume() called successfully');
+          logger.debug('NativeTTSService: Speech.resume() called successfully');
           this.updateState({
             status: TTSPlaybackStatus.PLAYING,
             isPlaying: true,
             isPaused: false,
           });
-          console.log('NativeTTSService: State updated to PLAYING');
+          logger.debug('NativeTTSService: State updated to PLAYING');
         } catch (error) {
-          console.error(
+          logger.error(
             'NativeTTSService: Error calling Speech.resume():',
             error
           );
@@ -309,7 +310,7 @@ export class NativeTTSService {
         }
       }
     } else {
-      console.log('NativeTTSService: Platform not available for resume');
+      logger.debug('NativeTTSService: Platform not available for resume');
     }
   }
 
@@ -341,7 +342,7 @@ export class NativeTTSService {
    */
   public async getAvailableVoices(language?: string): Promise<any[]> {
     if (!this.isAvailable()) {
-      console.log('NativeTTSService: Not available on this platform');
+      logger.debug('NativeTTSService: Not available on this platform');
       return [];
     }
 
@@ -349,7 +350,7 @@ export class NativeTTSService {
       const voices = await Speech.getAvailableVoicesAsync();
 
       if (voices.length === 0) {
-        console.warn('NativeTTSService: No voices available');
+        logger.warn('NativeTTSService: No voices available');
         return [];
       }
 
@@ -362,7 +363,7 @@ export class NativeTTSService {
 
       return transformedVoices;
     } catch (error) {
-      console.error('NativeTTSService: Error getting voices:', error);
+      logger.error('NativeTTSService: Error getting voices:', error);
       return [];
     }
   }
@@ -616,7 +617,7 @@ export class NativeTTSService {
       try {
         listener(this.playbackState);
       } catch (error) {
-        console.error('Error in state change listener:', error);
+        logger.error('Error in state change listener:', error);
       }
     });
   }
@@ -637,7 +638,7 @@ export class NativeTTSService {
       try {
         listener(error);
       } catch (listenerError) {
-        console.error('Error in error listener:', listenerError);
+        logger.error('Error in error listener:', listenerError);
       }
     });
   }

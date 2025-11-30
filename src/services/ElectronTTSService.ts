@@ -27,7 +27,7 @@ export class ElectronTTSService {
   private errorListeners: ((error: any) => void)[] = [];
 
   constructor() {
-    console.log('ElectronTTSService: Initialized');
+    logger.debug('ElectronTTSService: Initialized');
   }
 
   /**
@@ -53,7 +53,7 @@ export class ElectronTTSService {
    * Get available voices (not implemented for system TTS)
    */
   async getAvailableVoices(): Promise<any[]> {
-    console.log(
+    logger.debug(
       'ElectronTTSService: getAvailableVoices not implemented for system TTS'
     );
     return [];
@@ -70,8 +70,8 @@ export class ElectronTTSService {
       throw new Error('Electron TTS API not available');
     }
 
-    console.log('ElectronTTSService: Speaking text:', text);
-    console.log('ElectronTTSService: Config:', config);
+    logger.debug('ElectronTTSService: Speaking text:', text);
+    logger.debug('ElectronTTSService: Config:', config);
 
     // Return a Promise that resolves when speech completes
     return new Promise<void>((resolve, reject) => {
@@ -88,9 +88,9 @@ export class ElectronTTSService {
         let appSettings = null;
         try {
           appSettings = await storageService.loadSettings();
-          console.log('ElectronTTSService: Loaded app settings:', appSettings);
+          logger.debug('ElectronTTSService: Loaded app settings:', appSettings);
         } catch (error) {
-          console.log(
+          logger.debug(
             'ElectronTTSService: Failed to load app settings, using defaults:',
             error
           );
@@ -98,7 +98,7 @@ export class ElectronTTSService {
 
         // Use the language from config (statement language) or fall back to app settings
         const targetLanguage = config.language || appSettings?.language || 'en';
-        console.log(
+        logger.debug(
           'ElectronTTSService: Target language (from statement):',
           targetLanguage
         );
@@ -114,7 +114,7 @@ export class ElectronTTSService {
           selectedVoice = appSettings.tts.defaultVoice;
         }
 
-        console.log('ElectronTTSService: Voice selection debug:', {
+        logger.debug('ElectronTTSService: Voice selection debug:', {
           targetLanguage,
           voicesPerLanguage: appSettings?.tts?.voicesPerLanguage,
           selectedVoice,
@@ -137,7 +137,7 @@ export class ElectronTTSService {
 
           // Use the first English voice as default
           selectedVoice = englishVoices[0];
-          console.log(
+          logger.debug(
             'ElectronTTSService: Selected English voice:',
             selectedVoice
           );
@@ -157,7 +157,7 @@ export class ElectronTTSService {
 
           // Use the first Chinese voice as default
           selectedVoice = chineseVoices[0];
-          console.log(
+          logger.debug(
             'ElectronTTSService: Selected Chinese voice:',
             selectedVoice
           );
@@ -177,7 +177,7 @@ export class ElectronTTSService {
 
           // Use the first German voice as default
           selectedVoice = germanVoices[0];
-          console.log(
+          logger.debug(
             'ElectronTTSService: Selected German voice:',
             selectedVoice
           );
@@ -192,28 +192,28 @@ export class ElectronTTSService {
           language: targetLanguage, // Statement language
         };
 
-        console.log(
+        logger.debug(
           'ElectronTTSService: Calling system TTS with options:',
           options
         );
-        console.log(
+        logger.debug(
           'ElectronTTSService: Parameter conversion for Windows SAPI:'
         );
-        console.log(
+        logger.debug(
           '  - Rate:',
           options.rate,
           '→ SAPI Rate:',
           Math.round((options.rate - 1) * 10)
         );
-        console.log(
+        logger.debug(
           '  - Volume:',
           options.volume,
           '→ SAPI Volume:',
           Math.round(options.volume * 100)
         );
-        console.log('  - Pitch:', options.pitch, '(not supported by SAPI)');
-        console.log('  - Voice:', options.voice);
-        console.log('  - Language:', options.language);
+        logger.debug('  - Pitch:', options.pitch, '(not supported by SAPI)');
+        logger.debug('  - Voice:', options.voice);
+        logger.debug('  - Language:', options.language);
 
         // Keep state as loading until TTS actually starts
         this.updateState({
@@ -225,12 +225,12 @@ export class ElectronTTSService {
           totalDuration: 1, // Normalized for percentage calculation
         });
 
-        console.log('ElectronTTSService: Starting TTS call...');
+        logger.debug('ElectronTTSService: Starting TTS call...');
 
         // Wait for TTS to actually start, then update to playing
         // System TTS needs time to initialize, especially with voice selection
         setTimeout(() => {
-          console.log('ElectronTTSService: TTS should be playing now');
+          logger.debug('ElectronTTSService: TTS should be playing now');
           this.updateState({
             status: TTSPlaybackStatus.PLAYING,
             isLoading: false,
@@ -241,7 +241,7 @@ export class ElectronTTSService {
         (window as any).electronAPI
           .ttsSpeak(text, options)
           .then(() => {
-            console.log('ElectronTTSService: TTS completed successfully');
+            logger.debug('ElectronTTSService: TTS completed successfully');
             this.updateState({
               status: TTSPlaybackStatus.COMPLETED,
               currentText: text,
@@ -252,7 +252,7 @@ export class ElectronTTSService {
             resolve(); // Resolve the Promise when speech completes
           })
           .catch((error: any) => {
-            console.error('ElectronTTSService: TTS error:', error);
+            logger.error('ElectronTTSService: TTS error:', error);
             this.updateState({
               status: TTSPlaybackStatus.ERROR,
               error: error.message || 'TTS failed',
@@ -260,7 +260,7 @@ export class ElectronTTSService {
             reject(error);
           });
       } catch (error) {
-        console.error('ElectronTTSService: Speech failed:', error);
+        logger.error('ElectronTTSService: Speech failed:', error);
         this.updateState({
           status: TTSPlaybackStatus.ERROR,
           currentText: text,
@@ -284,15 +284,15 @@ export class ElectronTTSService {
    * Stop current speech
    */
   async stop(): Promise<void> {
-    console.log('ElectronTTSService: Stop requested');
+    logger.debug('ElectronTTSService: Stop requested');
 
     // Call Electron TTS stop via IPC
     if ((window as any).electronAPI?.ttsStop) {
       try {
         await (window as any).electronAPI.ttsStop();
-        console.log('ElectronTTSService: TTS stopped successfully');
+        logger.debug('ElectronTTSService: TTS stopped successfully');
       } catch (error) {
-        console.error('ElectronTTSService: Error stopping TTS:', error);
+        logger.error('ElectronTTSService: Error stopping TTS:', error);
       }
     }
 
@@ -351,7 +351,7 @@ export class ElectronTTSService {
    */
   private updateState(newState: Partial<TTSPlaybackState>): void {
     this.state = { ...this.state, ...newState };
-    console.log(
+    logger.debug(
       'ElectronTTSService: State updated:',
       newState,
       'Listeners:',
@@ -361,7 +361,7 @@ export class ElectronTTSService {
       try {
         listener(this.state);
       } catch (error) {
-        console.error('Error in state change listener:', error);
+        logger.error('Error in state change listener:', error);
       }
     });
   }

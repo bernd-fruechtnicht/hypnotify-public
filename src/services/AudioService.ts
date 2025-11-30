@@ -4,6 +4,7 @@
  */
 
 import { Audio } from 'expo-av';
+import { logger } from '../utils/logger';
 import { BackgroundMusicSettings, MediaPlayerState } from '../types';
 
 export class AudioService {
@@ -48,7 +49,7 @@ export class AudioService {
       this.isInitialized = true;
       this.updateState({ isLoading: false });
     } catch (error) {
-      console.error('Failed to initialize AudioService:', error);
+      logger.error('Failed to initialize AudioService:', error);
       throw new Error(`Audio service initialization failed: ${error}`);
     }
   }
@@ -79,7 +80,7 @@ export class AudioService {
           ? { uri: settings.musicPath }
           : settings.musicPath;
 
-      console.log('AudioService: Loading audio source:', soundSource);
+      logger.debug('AudioService: Loading audio source:', soundSource);
 
       const { sound } = await Audio.Sound.createAsync(soundSource, {
         shouldPlay: true,
@@ -111,7 +112,7 @@ export class AudioService {
 
       this.updateState({ isPlaying: true });
     } catch (error) {
-      console.error('Failed to play background music:', error);
+      logger.error('Failed to play background music:', error);
       throw new Error(`Background music playback failed: ${error}`);
     }
   }
@@ -125,7 +126,7 @@ export class AudioService {
         await this.backgroundMusic.pauseAsync();
         this.updateState({ isPlaying: false, isPaused: true });
       } catch (error) {
-        console.error('Failed to pause background music:', error);
+        logger.error('Failed to pause background music:', error);
         throw new Error(`Background music pause failed: ${error}`);
       }
     }
@@ -140,7 +141,7 @@ export class AudioService {
         await this.backgroundMusic.playAsync();
         this.updateState({ isPlaying: true, isPaused: false });
       } catch (error) {
-        console.error('Failed to resume background music:', error);
+        logger.error('Failed to resume background music:', error);
         throw new Error(`Background music resume failed: ${error}`);
       }
     }
@@ -151,7 +152,7 @@ export class AudioService {
    */
   public async stopBackgroundMusic(): Promise<void> {
     if (!this.backgroundMusic) {
-      console.log('AudioService: No background music to stop');
+      logger.debug('AudioService: No background music to stop');
       return;
     }
 
@@ -176,9 +177,9 @@ export class AudioService {
       this.currentMusicSettings = null;
       this.updateState(this.createInitialState());
 
-      console.log('AudioService: Background music stopped successfully');
+      logger.debug('AudioService: Background music stopped successfully');
     } catch (error) {
-      console.error('AudioService: Failed to stop background music:', error);
+      logger.error('AudioService: Failed to stop background music:', error);
       // Clean up state even if stop failed
       this.backgroundMusic = null;
       this.currentMusicSettings = null;
@@ -196,7 +197,7 @@ export class AudioService {
         await this.backgroundMusic.setVolumeAsync(volume);
         this.updateState({ volume });
       } catch (error) {
-        console.error('Failed to set background music volume:', error);
+        logger.error('Failed to set background music volume:', error);
         throw new Error(`Volume adjustment failed: ${error}`);
       }
     }
@@ -211,7 +212,7 @@ export class AudioService {
         await this.backgroundMusic.setRateAsync(rate, true);
         this.updateState({ playbackRate: rate });
       } catch (error) {
-        console.error('Failed to set background music playback rate:', error);
+        logger.error('Failed to set background music playback rate:', error);
         throw new Error(`Playback rate adjustment failed: ${error}`);
       }
     }
@@ -292,7 +293,7 @@ export class AudioService {
       try {
         listener(this.playerState);
       } catch (error) {
-        console.error('Error in audio state change listener:', error);
+        logger.error('Error in audio state change listener:', error);
       }
     });
   }
@@ -319,7 +320,7 @@ export class AudioService {
    */
   private async fadeOut(duration: number): Promise<void> {
     if (!this.backgroundMusic) {
-      console.log('AudioService: No background music to fade out');
+      logger.debug('AudioService: No background music to fade out');
       return;
     }
 
@@ -331,7 +332,7 @@ export class AudioService {
       for (let i = steps; i >= 0; i--) {
         // Check if music still exists before each step
         if (!this.backgroundMusic) {
-          console.log(
+          logger.debug(
             'AudioService: Background music became null during fade out'
           );
           break;
@@ -342,9 +343,9 @@ export class AudioService {
         await new Promise(resolve => setTimeout(resolve, stepDuration * 1000));
       }
 
-      console.log('AudioService: Fade out completed');
+      logger.debug('AudioService: Fade out completed');
     } catch (error) {
-      console.error('AudioService: Error during fade out:', error);
+      logger.error('AudioService: Error during fade out:', error);
       // Don't throw error, just log it
     }
   }

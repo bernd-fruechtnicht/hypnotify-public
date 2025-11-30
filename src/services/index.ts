@@ -73,9 +73,9 @@ export const initializeServices = async (): Promise<void> => {
       await dataSeedingService.seedInitialData();
     }
 
-    console.log('All services initialized successfully');
+    logger.debug('All services initialized successfully');
   } catch (error) {
-    console.error('Failed to initialize services:', error);
+    logger.error('Failed to initialize services:', error);
     throw new Error(`Service initialization failed: ${error}`);
   }
 };
@@ -95,9 +95,9 @@ export const cleanupServices = async (): Promise<void> => {
       // backgroundMusicService.cleanup() // Only cleanup if initialized
     ]);
 
-    console.log('All services cleaned up successfully');
+    logger.debug('All services cleaned up successfully');
   } catch (error) {
-    console.error('Failed to cleanup services:', error);
+    logger.error('Failed to cleanup services:', error);
     throw new Error(`Service cleanup failed: ${error}`);
   }
 };
@@ -111,7 +111,7 @@ export const getServiceHealth = async (): Promise<{
   storage: boolean;
 }> => {
   try {
-    console.log('getServiceHealth: Checking service health...');
+    logger.debug('getServiceHealth: Checking service health...');
 
     const [ttsAvailable, audioInitialized, storageInitialized] =
       await Promise.all([
@@ -120,7 +120,7 @@ export const getServiceHealth = async (): Promise<{
         Promise.resolve(storageService.getStorageInfo() !== null),
       ]);
 
-    console.log('getServiceHealth: Results:', {
+    logger.debug('getServiceHealth: Results:', {
       tts: ttsAvailable,
       audio: audioInitialized,
       storage: storageInitialized,
@@ -132,7 +132,7 @@ export const getServiceHealth = async (): Promise<{
       storage: storageInitialized,
     };
   } catch (error) {
-    console.error('Failed to get service health:', error);
+    logger.error('Failed to get service health:', error);
     return {
       tts: false,
       audio: false,
