@@ -7,8 +7,9 @@ import {
   Modal,
   ScrollView,
   TextInput,
+  Platform,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
 import { StandardHeader } from './StandardHeader';
@@ -35,7 +36,6 @@ export const StatementSelector: React.FC<StatementSelectorProps> = ({
 }) => {
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
-  const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<string>('');
@@ -118,19 +118,15 @@ export const StatementSelector: React.FC<StatementSelectorProps> = ({
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      presentationStyle="fullScreen"
       onRequestClose={handleCancel}
       statusBarTranslucent={false}
     >
-      <View
-        style={[
-          styles.container,
-          { paddingTop: insets.top, paddingBottom: insets.bottom },
-        ]}
-      >
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <StandardHeader
           title={t('sessionEdit.addStatements')}
           onBack={handleCancel}
+          inModal={true}
         />
 
         <View style={styles.searchContainer}>
@@ -151,7 +147,13 @@ export const StatementSelector: React.FC<StatementSelectorProps> = ({
           )}
         </View>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.content}
+          contentInsetAdjustmentBehavior={
+            Platform.OS === 'ios' ? 'automatic' : undefined
+          }
+          showsVerticalScrollIndicator={false}
+        >
           {filteredStatements.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>
@@ -201,7 +203,7 @@ export const StatementSelector: React.FC<StatementSelectorProps> = ({
             />
           </View>
         )}
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 };

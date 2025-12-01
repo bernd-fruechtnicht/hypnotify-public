@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { LanguageFlagSelector } from './LanguageFlagSelector';
@@ -16,6 +22,7 @@ interface StandardHeaderProps {
     onPress: () => void;
     style?: 'primary' | 'secondary';
   };
+  inModal?: boolean; // Indicates if header is inside a modal (for Android safe area handling)
 }
 
 export const StandardHeader: React.FC<StandardHeaderProps> = ({
@@ -26,12 +33,20 @@ export const StandardHeader: React.FC<StandardHeaderProps> = ({
   subtitle,
   subtitleElement,
   actionButton,
+  inModal = false,
 }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
+  // Best practice: Use safe area insets for top padding
+  // On iOS: Always needed for Status Bar and Notch
+  // On Android in modals: With statusBarTranslucent={false}, the modal handles the status bar,
+  //   so we don't need additional padding (insets.top may still have a value, but we ignore it)
+  // On Android in normal screens: insets.top handles Status Bar
+  const topPadding = Platform.OS === 'android' && inModal ? 0 : insets.top;
+
   return (
-    <View style={[styles.header, { paddingTop: insets.top }]}>
+    <View style={[styles.header, { paddingTop: topPadding }]}>
       {/* Top row: Back button, Title, Language selector or right element */}
       <View style={styles.headerTop}>
         <View style={styles.headerLeft}>

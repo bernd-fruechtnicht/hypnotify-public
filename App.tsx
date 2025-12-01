@@ -395,7 +395,7 @@ const AppContent: React.FC = () => {
       <Modal
         visible={showSessionEdit}
         animationType="slide"
-        presentationStyle="pageSheet"
+        presentationStyle="fullScreen"
       >
         <SessionEditScreen
           session={editingSession}

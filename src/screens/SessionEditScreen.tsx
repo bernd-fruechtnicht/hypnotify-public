@@ -8,6 +8,7 @@ import {
   Alert,
   TextInput,
   BackHandler,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -247,18 +248,25 @@ export const SessionEditScreen: React.FC<SessionEditScreenProps> = ({
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <StandardHeader
         title={getSessionName(editedSession, currentLanguage)}
         subtitle={`${editedSession.statementIds.length} ${t('common.statements')}`}
         onBack={onCancel}
+        inModal={true}
         actionButton={{
           text: t('common.save'),
           onPress: handleSave,
         }}
       />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        contentInsetAdjustmentBehavior={
+          Platform.OS === 'ios' ? 'automatic' : undefined
+        }
+        showsVerticalScrollIndicator={false}
+      >
         {/* Session Name Editing - Only for regular sessions, not stereo mode */}
         {!isStereoMode && (
           <View style={styles.section}>

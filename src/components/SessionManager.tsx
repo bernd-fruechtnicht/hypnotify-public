@@ -8,7 +8,7 @@ import {
   Modal,
   Alert,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { logger } from '../utils/logger';
 import { storageService } from '../services';
@@ -37,7 +37,6 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
 }) => {
   const { t } = useTranslation();
   const { currentLanguage } = useLanguage();
-  const insets = useSafeAreaInsets();
   const [sessions, setSessions] = useState<MeditationSession[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -161,17 +160,16 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      presentationStyle="fullScreen"
       onRequestClose={onClose}
       statusBarTranslucent={false}
     >
-      <View
-        style={[
-          styles.container,
-          { paddingTop: insets.top, paddingBottom: insets.bottom },
-        ]}
-      >
-        <StandardHeader title={t('sessionManager.title')} onBack={onClose} />
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <StandardHeader
+          title={t('sessionManager.title')}
+          onBack={onClose}
+          inModal={true}
+        />
 
         {/* Sessions List */}
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -245,7 +243,7 @@ export const SessionManager: React.FC<SessionManagerProps> = ({
             ))
           )}
         </ScrollView>
-      </View>
+      </SafeAreaView>
     </Modal>
   );
 };
