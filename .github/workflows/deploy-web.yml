@@ -1,103 +1,29 @@
 name: Deploy Web
 
 on:
-  workflow_run:
-    workflows: ['Quality Checks']
-    types:
-      - completed
-    branches: [main]
-    # Note: workflow_run triggers on 'completed' (both success and failure)
-    # We check conclusion == 'success' in check-deploy job
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  # Quality Checks bei workflow_dispatch (manueller Trigger, nur von main)
-  # Bei workflow_run werden Quality Checks bereits vom Quality Checks Workflow ausgeführt
   quality-checks:
     name: Quality Checks
     uses: ./.github/workflows/reusable-quality-checks.yml
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-
-  # Prüfe Commit-Message bei workflow_run
-  # Best Practice: Checkout und lese Commit-Message direkt aus dem Repository
-  # statt aus workflow_run.head_commit (kann null sein)
-  check-deploy:
-    name: Check Deploy Condition
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_run'
-    outputs:
-      should-deploy: ${{ steps.check.outputs.should-deploy }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          fetch-depth: 0
-
-      - name: Check deploy condition
-        id: check
-        run: |
-          # Prüfe Branch
-          if [ "${{ github.event.workflow_run.head_branch }}" != "main" ]; then
-            echo "should-deploy=false" >> $GITHUB_OUTPUT
-            echo "❌ Not on main branch"
-            exit 0
-          fi
-
-          # Prüfe Quality Checks Ergebnis
-          if [ "${{ github.event.workflow_run.conclusion }}" != "success" ]; then
-            echo "should-deploy=false" >> $GITHUB_OUTPUT
-            echo "❌ Quality Checks not successful"
-            exit 0
-          fi
-
-          # Lese Commit-Message direkt aus Git (robuster als workflow_run.head_commit)
-          COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
-          COMMIT_MSG=$(git log -1 --format=%B "$COMMIT_SHA")
-
-          echo "Commit SHA: $COMMIT_SHA"
-          echo "Commit Message: $COMMIT_MSG"
-
-          # Prüfe auf Deployment-Trigger in Commit-Message
-          if [[ "$COMMIT_MSG" == *"[deploy web]"* ]] || [[ "$COMMIT_MSG" == *"[deploy]"* ]]; then
-            echo "should-deploy=true" >> $GITHUB_OUTPUT
-            echo "✅ Deployment triggered by commit message"
-          else
-            echo "should-deploy=false" >> $GITHUB_OUTPUT
-            echo "⏭️  No deployment trigger in commit message"
-          fi
+    if: github.ref == 'refs/heads/main'
 
   deploy-web:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
-    # Warte auf Quality Checks (bei workflow_dispatch) oder auf workflow_run
-    # Deployment nur von main Branch (sowohl bei workflow_run als auch workflow_dispatch)
-    # Bei workflow_run: Nur bei [deploy web] in Commit-Message (nur auf main)
     needs:
       - quality-checks
-      - check-deploy
     if: |
-      (github.event_name == 'workflow_run' &&
-       needs.check-deploy.result == 'success' &&
-       needs.check-deploy.outputs.should-deploy == 'true') ||
-      (github.event_name == 'workflow_dispatch' &&
-       github.ref == 'refs/heads/main' &&
-       needs.quality-checks.result == 'success')
+      github.ref == 'refs/heads/main' &&
+      needs.quality-checks.result == 'success'
     environment:
       name: Production – hypnotify
-      # Optional: Protection rules aktivieren für zusätzliche Sicherheit
 
     steps:
-      - name: Debug deployment condition
-        if: github.event_name == 'workflow_run'
-        run: |
-          echo "check-deploy result: ${{ needs.check-deploy.result }}"
-          echo "check-deploy should-deploy: ${{ needs.check-deploy.outputs.should-deploy }}"
-          echo "quality-checks result: ${{ needs.quality-checks.result }}"
-
       - name: Trigger Vercel Deploy Hook
         run: |
           if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
@@ -107,7 +33,5 @@ jobs:
           curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
 
   # Note: Vercel Git Integration ist deaktiviert (vercel.json)
-  # Deployment erfolgt via:
-  # - Deploy Hook bei [deploy web] Commit-Message (automatisch auf main, nach Quality Checks)
-  # - workflow_dispatch (manuell, nur von main, nach Quality Checks)
+  # Deployment erfolgt nur via workflow_dispatch (manuell, nur von main, nach Quality Checks)
   # Lokale Deployments sind weiterhin möglich: vercel deploy --prod

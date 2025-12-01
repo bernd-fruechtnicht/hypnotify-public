@@ -1,11 +1,6 @@
 name: Deploy Android
 
 on:
-  workflow_run:
-    workflows: ['Quality Checks']
-    types:
-      - completed
-    branches: [main]
   workflow_dispatch:
     inputs:
       profile:
@@ -21,31 +16,19 @@ permissions:
   contents: read
 
 jobs:
-  # Quality Checks bei workflow_dispatch (manueller Trigger, nur von main)
-  # Bei workflow_run werden Quality Checks bereits vom Quality Checks Workflow ausgeführt
   quality-checks:
     name: Quality Checks
     uses: ./.github/workflows/reusable-quality-checks.yml
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
 
   build-android:
     name: Build Android App
-    # Warte auf Quality Checks (bei workflow_dispatch) oder auf workflow_run
-    # Build nur von main Branch (sowohl bei workflow_run als auch workflow_dispatch)
-    # Bei workflow_run: Nur bei [deploy android] in Commit-Message (nur auf main)
     needs:
       - quality-checks
     uses: ./.github/workflows/reusable-eas-build.yml
     if: |
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_commit &&
-       github.event.workflow_run.head_branch == 'main' &&
-       (contains(github.event.workflow_run.head_commit.message, '[deploy android]') ||
-        contains(github.event.workflow_run.head_commit.message, '[deploy]'))) ||
-      (github.event_name == 'workflow_dispatch' &&
-       github.ref == 'refs/heads/main' &&
-       needs.quality-checks.result == 'success')
+      github.ref == 'refs/heads/main' &&
+      needs.quality-checks.result == 'success'
     with:
       platform: 'android'
       profile: ${{ github.event.inputs.profile || 'production' }}
