@@ -6,6 +6,8 @@ on:
     types:
       - completed
     branches: [main]
+    # Note: workflow_run triggers on 'completed' (both success and failure)
+    # We check conclusion == 'success' in check-deploy job
   workflow_dispatch:
 
 permissions:
@@ -20,41 +22,52 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
 
   # Prüfe Commit-Message bei workflow_run
+  # Best Practice: Checkout und lese Commit-Message direkt aus dem Repository
+  # statt aus workflow_run.head_commit (kann null sein)
   check-deploy:
     name: Check Deploy Condition
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_run'
     outputs:
-      should-deploy: ${{ steps.check.outputs.should-deploy || 'false' }}
+      should-deploy: ${{ steps.check.outputs.should-deploy }}
     steps:
-      - name: Check commit message
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Check deploy condition
         id: check
         run: |
-          echo "Head Branch: ${{ github.event.workflow_run.head_branch }}"
-          echo "Conclusion: ${{ github.event.workflow_run.conclusion }}"
-          echo "Head Commit: ${{ toJSON(github.event.workflow_run.head_commit) }}"
-
+          # Prüfe Branch
           if [ "${{ github.event.workflow_run.head_branch }}" != "main" ]; then
             echo "should-deploy=false" >> $GITHUB_OUTPUT
-            echo "Not on main branch"
+            echo "❌ Not on main branch"
             exit 0
           fi
 
+          # Prüfe Quality Checks Ergebnis
           if [ "${{ github.event.workflow_run.conclusion }}" != "success" ]; then
             echo "should-deploy=false" >> $GITHUB_OUTPUT
-            echo "Quality Checks not successful"
+            echo "❌ Quality Checks not successful"
             exit 0
           fi
 
-          COMMIT_MSG="${{ github.event.workflow_run.head_commit.message }}"
+          # Lese Commit-Message direkt aus Git (robuster als workflow_run.head_commit)
+          COMMIT_SHA="${{ github.event.workflow_run.head_sha }}"
+          COMMIT_MSG=$(git log -1 --format=%B "$COMMIT_SHA")
+
+          echo "Commit SHA: $COMMIT_SHA"
           echo "Commit Message: $COMMIT_MSG"
 
+          # Prüfe auf Deployment-Trigger in Commit-Message
           if [[ "$COMMIT_MSG" == *"[deploy web]"* ]] || [[ "$COMMIT_MSG" == *"[deploy]"* ]]; then
             echo "should-deploy=true" >> $GITHUB_OUTPUT
-            echo "Deployment triggered by commit message"
+            echo "✅ Deployment triggered by commit message"
           else
             echo "should-deploy=false" >> $GITHUB_OUTPUT
-            echo "No deployment trigger in commit message"
+            echo "⏭️  No deployment trigger in commit message"
           fi
 
   deploy-web:
@@ -68,7 +81,7 @@ jobs:
       - check-deploy
     if: |
       (github.event_name == 'workflow_run' &&
-       (needs.check-deploy.result == 'success' || needs.check-deploy.result == 'skipped') &&
+       needs.check-deploy.result == 'success' &&
        needs.check-deploy.outputs.should-deploy == 'true') ||
       (github.event_name == 'workflow_dispatch' &&
        github.ref == 'refs/heads/main' &&
@@ -78,6 +91,13 @@ jobs:
       # Optional: Protection rules aktivieren für zusätzliche Sicherheit
 
     steps:
+      - name: Debug deployment condition
+        if: github.event_name == 'workflow_run'
+        run: |
+          echo "check-deploy result: ${{ needs.check-deploy.result }}"
+          echo "check-deploy should-deploy: ${{ needs.check-deploy.outputs.should-deploy }}"
+          echo "quality-checks result: ${{ needs.quality-checks.result }}"
+
       - name: Trigger Vercel Deploy Hook
         run: |
           if [ -z "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
