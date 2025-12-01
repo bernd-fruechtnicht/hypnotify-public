@@ -1,11 +1,8 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch: # Allow manual triggers
+  workflow_dispatch: # Allow manual triggers only
+  # Note: push and pull_request triggers removed - use quality-checks.yml instead
 
 permissions:
   contents: read
