@@ -9,6 +9,7 @@ import {
   Dimensions,
   BackHandler,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 import { logger } from '../utils/logger';
@@ -218,25 +219,25 @@ export const PlayerScreen: React.FC<PlayerScreenProps> = ({
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer} edges={['bottom']}>
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (statements.length === 0) {
     return (
-      <View style={styles.errorContainer}>
+      <SafeAreaView style={styles.errorContainer} edges={['bottom']}>
         <Text style={styles.errorText}>{t('player.noStatements')}</Text>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Text style={styles.backButtonText}>{t('common.back')}</Text>
         </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <StandardHeader
         title={getSessionName(session, currentLanguage)}
         onBack={handleBack}
@@ -325,7 +326,7 @@ export const PlayerScreen: React.FC<PlayerScreenProps> = ({
 
       {/* Toast notifications */}
       <Toast />
-    </View>
+    </SafeAreaView>
   );
 };
 

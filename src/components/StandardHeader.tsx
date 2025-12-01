@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { LanguageFlagSelector } from './LanguageFlagSelector';
 
@@ -27,9 +28,10 @@ export const StandardHeader: React.FC<StandardHeaderProps> = ({
   actionButton,
 }) => {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: insets.top }]}>
       {/* Top row: Back button, Title, Language selector or right element */}
       <View style={styles.headerTop}>
         <View style={styles.headerLeft}>

@@ -10,6 +10,7 @@ import {
   // TextInput,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
 import { VoiceSelector } from '../components/VoiceSelector';
@@ -288,14 +289,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer} edges={['bottom']}>
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       {/* Header */}
       <StandardHeader
         title={t('settings.title')}
@@ -744,7 +745,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           volume: settings.tts.defaultVolume,
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -765,6 +766,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   section: {
     backgroundColor: '#FFFFFF',

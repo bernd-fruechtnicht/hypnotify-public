@@ -18,6 +18,7 @@ import {
   Dimensions,
   // Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -108,9 +109,9 @@ const StatementsListContent: React.FC<{ session: StereoSession }> = ({
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
+      <SafeAreaView style={styles.loadingContainer} edges={['bottom']}>
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -636,7 +637,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
 
   if (isLoading || !isInitialized) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <StandardHeader
           title={t('stereo.title', 'Stereo Meditation')}
           onBack={handleBack}
@@ -647,13 +648,13 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
             {t('stereo.initializing', 'Initializing...')}
           </Text>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   if (!session) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['bottom']}>
         <StandardHeader
           title={t('stereo.title', 'Stereo Meditation')}
           onBack={handleBack}
@@ -666,12 +667,12 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
             <Text style={styles.backButtonText}>← {t('common.back')}</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <StandardHeader
         title={t('stereo.title', 'Stereo Meditation')}
         onBack={handleBack}
@@ -901,7 +902,7 @@ export const StereoSessionScreen: React.FC<StereoSessionScreenProps> = ({
 
       {/* Toast notifications */}
       <Toast />
-    </View>
+    </SafeAreaView>
   );
 };
 

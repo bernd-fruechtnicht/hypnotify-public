@@ -9,6 +9,7 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { logger } from '../utils/logger';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -214,7 +215,7 @@ export const LibraryScreen: React.FC<LibraryScreenProps> = ({
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <StandardHeader
         title={t('library.title')}
         onBack={onBack}
@@ -303,7 +304,7 @@ export const LibraryScreen: React.FC<LibraryScreenProps> = ({
           })
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

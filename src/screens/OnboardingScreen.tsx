@@ -8,6 +8,7 @@ import {
   Dimensions,
   // Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { logger } from '../utils/logger';
 import { LanguageSelector } from '../components/LanguageSelector';
@@ -172,7 +173,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   const isFirstStep = currentStep === 0;
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       {/* Progress Indicator */}
       <View style={styles.progressContainer}>
         <View style={styles.progressBar}>
@@ -353,7 +354,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

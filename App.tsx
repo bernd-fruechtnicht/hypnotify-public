@@ -10,7 +10,11 @@ import {
   BackHandler,
   Modal,
 } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import './src/services/i18n'; // Initialize i18n first
 // Trigger Vercel deployment
 import { useTranslation } from 'react-i18next';
@@ -40,6 +44,7 @@ type AppScreen =
 
 const AppContent: React.FC = () => {
   const { t, ready } = useTranslation();
+  const insets = useSafeAreaInsets();
   // const { } = useLanguage();
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('home');
   const [showServiceTester, setShowServiceTester] = useState(false);
@@ -251,7 +256,7 @@ const AppContent: React.FC = () => {
       default:
         return (
           <View style={styles.content}>
-            <View style={styles.headerContainer}>
+            <View style={[styles.headerContainer, { top: insets.top + 12 }]}>
               <LanguageFlagSelector />
             </View>
             <Text style={styles.title}>{t('app.name')}</Text>
@@ -367,7 +372,8 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={[]}>
+      <StatusBar style="dark" backgroundColor="#fff" />
       {renderScreen()}
 
       <ServiceTester
@@ -397,8 +403,6 @@ const AppContent: React.FC = () => {
           onCancel={handleSessionEditCancel}
         />
       </Modal>
-
-      <StatusBar style="auto" />
     </SafeAreaView>
   );
 };
@@ -426,7 +430,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     position: 'absolute',
-    top: 12,
     right: 20,
     zIndex: 1000,
   },

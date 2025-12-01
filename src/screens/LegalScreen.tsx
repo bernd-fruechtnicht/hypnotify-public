@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Linking } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { StandardHeader } from '../components/StandardHeader';
 import { logger } from '../utils/logger';
@@ -27,7 +28,7 @@ export const LegalScreen: React.FC<LegalScreenProps> = ({ onBack }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <StandardHeader
         title={t('legal.title', 'Legal Information')}
         onBack={onBack}
@@ -139,7 +140,7 @@ export const LegalScreen: React.FC<LegalScreenProps> = ({ onBack }) => {
           </Text>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -150,6 +151,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   section: {
     backgroundColor: '#FFFFFF',
